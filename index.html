@@ -540,27 +540,52 @@ function connectGoogleDrive(){
   _driveTokenClient.requestAccessToken({ prompt: _driveAccessToken ? '' : 'consent' });
 }
 
+// Recursively lists every file under a given Drive folder ID, descending into subfolders.
+async function _listDriveFilesRecursive(folderId, depth){
+  if(depth > 6) return []; // safety cap against pathological folder nesting
+  const listUrl = 'https://www.googleapis.com/drive/v3/files?q=' +
+    encodeURIComponent(`'${folderId}' in parents and trashed=false`) +
+    '&fields=' + encodeURIComponent('files(id,name,mimeType,modifiedTime)') +
+    '&pageSize=1000&orderBy=modifiedTime desc';
+  const res = await fetch(listUrl, { headers: { Authorization: 'Bearer ' + _driveAccessToken } });
+
+  if(res.status === 401){
+    _driveAccessToken = null;
+    throw new Error('SESSION_EXPIRED');
+  }
+  if(!res.ok){
+    const errBody = await res.json().catch(()=>({}));
+    throw new Error((errBody && errBody.error && errBody.error.message) || ('HTTP '+res.status));
+  }
+
+  const data = await res.json();
+  const entries = data.files || [];
+  const subfolders = entries.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+  const here = entries.filter(f => f.mimeType !== 'application/vnd.google-apps.folder');
+
+  let nested = [];
+  for(const sub of subfolders){
+    const subFiles = await _listDriveFilesRecursive(sub.id, depth + 1);
+    nested = nested.concat(subFiles);
+  }
+  return here.concat(nested);
+}
+
 async function loadFilesFromDrive(){
   _setDriveStatus('⏳ Checking your Drive access…');
   try{
-    const listUrl = 'https://www.googleapis.com/drive/v3/files?q=' +
-      encodeURIComponent(`'${DRIVE_FOLDER_ID}' in parents and trashed=false`) +
-      '&fields=' + encodeURIComponent('files(id,name,mimeType,modifiedTime)') +
-      '&pageSize=1000&orderBy=modifiedTime desc';
-    const listRes = await fetch(listUrl, { headers: { Authorization: 'Bearer ' + _driveAccessToken } });
-
-    if(listRes.status === 401){
-      _driveAccessToken = null;
-      _setDriveStatus('⚠️ Your session expired — click "Connect Google Drive" again.');
-      return;
-    }
-    if(!listRes.ok){
-      const errBody = await listRes.json().catch(()=>({}));
-      throw new Error((errBody && errBody.error && errBody.error.message) || ('HTTP '+listRes.status));
+    let allEntries;
+    try{
+      allEntries = await _listDriveFilesRecursive(DRIVE_FOLDER_ID, 0);
+    }catch(e){
+      if(e.message === 'SESSION_EXPIRED'){
+        _setDriveStatus('⚠️ Your session expired — click "Connect Google Drive" again.');
+        return;
+      }
+      throw e;
     }
 
-    const listData = await listRes.json();
-    const excelFiles = (listData.files || []).filter(f =>
+    const excelFiles = allEntries.filter(f =>
       /\.(xlsx|xls|xlsm)$/i.test(f.name) || f.mimeType === 'application/vnd.google-apps.spreadsheet'
     );
 
