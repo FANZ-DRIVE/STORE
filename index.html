@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FANZ Spinning Mills — Consumption Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+  :root{
+    --bg:#0f1117;--surface:#161b27;--surface2:#1c2235;
+    --border:#252d42;--accent:#10d9a0;--accent2:#a855f7;
+    --text:#e2e8f8;--muted:#5a6a8a;--danger:#f43f5e;--success:#10d9a0;
+    --radius:10px;
+    --glow-teal:rgba(16,217,160,.18);--glow-purple:rgba(168,85,247,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* ── HEADER ── */
+  header{
+    padding:18px 26px;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#0d1020 0%,#141828 50%,#0f1320 100%);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 2px 24px rgba(16,217,160,.07);
+    position:relative;overflow:hidden;
+  }
+  header::before{
+    content:'';position:absolute;top:-40px;right:-40px;
+    width:200px;height:200px;border-radius:50%;
+    background:radial-gradient(circle,rgba(168,85,247,.12) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  header::after{
+    content:'';position:absolute;bottom:-50px;left:100px;
+    width:180px;height:180px;border-radius:50%;
+    background:radial-gradient(circle,rgba(16,217,160,.09) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .logo h1{font-size:1.4rem;font-weight:800;letter-spacing:-.3px;}
+  .logo h1 span{
+    background:linear-gradient(90deg,#10d9a0,#a855f7);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .logo p{font-size:.7rem;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;letter-spacing:.5px;}
+  .hstats{display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{
+    background:linear-gradient(135deg,rgba(16,217,160,.08),rgba(168,85,247,.06));
+    border:1px solid rgba(16,217,160,.2);border-radius:8px;padding:6px 14px;text-align:center;
+    transition:all .2s;
+  }
+  .chip:hover{border-color:var(--accent);box-shadow:0 0 12px var(--glow-teal);}
+  .chip .v{font-size:.95rem;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;}
+  .chip .l{font-size:.62rem;color:var(--muted);margin-top:1px;}
+
+  .main{display:flex;height:calc(100vh - 73px);overflow:hidden;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    width:280px;min-width:240px;
+    background:linear-gradient(180deg,#13192a 0%,#0f1320 100%);
+    border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;
+  }
+  .sb{overflow-y:auto;flex:1;padding:16px;}
+  .sb::-webkit-scrollbar{width:3px;}
+  .sb::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .slbl{
+    font-size:.62rem;font-weight:700;letter-spacing:2.5px;color:var(--muted);
+    text-transform:uppercase;margin-bottom:8px;margin-top:16px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .slbl::after{content:'';flex:1;height:1px;background:var(--border);}
+  .slbl:first-child{margin-top:0;}
+
+  /* GOOGLE DRIVE BOX */
+  .gdbox{
+    border:1.5px solid rgba(16,217,160,.28);border-radius:var(--radius);
+    padding:12px 12px 11px;margin-bottom:12px;
+    background:linear-gradient(135deg,rgba(16,217,160,.07),rgba(168,85,247,.05));
+  }
+  .gdbox .gdt{font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+  .gdbox .gds{font-size:.66rem;color:var(--muted);line-height:1.45;margin-bottom:9px;}
+  .gdbtn{
+    width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:none;border-radius:7px;padding:8px 8px;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;
+    cursor:pointer;transition:all .2s;white-space:nowrap;
+    background:linear-gradient(135deg,#059c72,#10d9a0);color:#0a1a14;
+    box-shadow:0 2px 12px rgba(16,217,160,.3);
+  }
+  .gdbtn:hover{background:linear-gradient(135deg,#10d9a0,#34eba8);box-shadow:0 4px 20px rgba(16,217,160,.45);transform:translateY(-1px);}
+  .gdbtn.small{padding:5px 8px;font-size:.68rem;margin-top:6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);box-shadow:none;}
+  .gdbtn.small:hover{border-color:var(--accent);color:var(--accent);background:rgba(16,217,160,.08);transform:none;}
+  .gddiv{display:flex;align-items:center;gap:8px;margin:11px 0;color:var(--muted);font-size:.62rem;font-family:'DM Mono',monospace;letter-spacing:.5px;}
+  .gddiv::before,.gddiv::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* DROP ZONE */
+  .dzone{
+    border:2px dashed var(--border);border-radius:var(--radius);
+    padding:18px 10px;text-align:center;margin-bottom:10px;transition:all .2s;
+    background:rgba(16,217,160,.02);
+  }
+  .dzone.over{
+    border-color:var(--accent);background:rgba(16,217,160,.06);
+    box-shadow:0 0 20px var(--glow-teal);
+  }
+  .dzone .di{font-size:1.8rem;line-height:1;margin-bottom:5px;}
+  .dzone p{font-size:.72rem;color:var(--muted);line-height:1.45;}
+  .dzone strong{color:var(--text);}
+
+  .lbtns{display:flex;gap:7px;margin-bottom:14px;}
+  .btn{
+    flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+    border:none;border-radius:7px;padding:9px 8px;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;
+    cursor:pointer;transition:all .2s;white-space:nowrap;
+  }
+  .bfolder{
+    background:linear-gradient(135deg,#059c72,#10d9a0);color:#0a1a14;
+    box-shadow:0 2px 12px rgba(16,217,160,.3);
+  }
+  .bfolder:hover{
+    background:linear-gradient(135deg,#10d9a0,#34eba8);
+    box-shadow:0 4px 20px rgba(16,217,160,.45);transform:translateY(-1px);
+  }
+  .bfiles{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .bfiles:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(168,85,247,.08);}
+  .bclear{background:transparent;color:var(--muted);border:1px solid var(--border);width:100%;margin-top:4px;}
+  .bclear:hover{border-color:var(--danger);color:var(--danger);background:rgba(244,63,94,.06);}
+
+  /* FILE COUNT BADGE */
+  .fcount-badge{
+    display:flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,rgba(16,217,160,.08),rgba(168,85,247,.05));
+    border:1px solid rgba(16,217,160,.2);border-radius:6px;padding:7px 10px;margin-bottom:12px;
+  }
+  .fcount-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 6px var(--accent);}
+  .fcount-text{flex:1;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);}
+  .fcount-clear{font-size:.68rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:color .15s;padding:0 2px;}
+  .fcount-clear:hover{color:var(--danger);}
+
+  /* FILTERS */
+  .fb{margin-bottom:11px;}
+  .fb label{font-size:.68rem;color:var(--muted);margin-bottom:4px;display:block;letter-spacing:.3px;}
+  select,input[type=text]{
+    width:100%;background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;padding:7px 9px;
+    font-family:'DM Mono',monospace;font-size:.76rem;appearance:none;outline:none;transition:all .18s;
+  }
+  select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow-teal);}
+  option{background:var(--surface2);}
+  .sw{position:relative;}
+  .sw::before{content:'⌕';position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.95rem;pointer-events:none;}
+  .sw input{padding-left:26px;}
+
+  /* DATE RANGE */
+  .dr-wrap{display:flex;flex-direction:column;gap:5px;}
+  .dr-row{display:flex;align-items:center;gap:6px;}
+  .dr-row span{font-size:.65rem;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+  input[type=date]{
+    width:100%;background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;padding:7px 9px;
+    font-family:'DM Mono',monospace;font-size:.74rem;appearance:none;outline:none;transition:all .18s;color-scheme:dark;
+  }
+  input[type=date]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow-teal);}
+  .dr-presets{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;}
+  .drp{
+    padding:4px 7px;background:var(--surface2);border:1px solid var(--border);
+    color:var(--muted);border-radius:5px;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .15s;
+  }
+  .drp:hover,.drp.on{border-color:var(--accent);color:var(--accent);background:rgba(16,217,160,.1);}
+
+  /* ── TOOLBAR ── */
+  .content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .toolbar{
+    padding:11px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+    background:linear-gradient(90deg,#13192a,#161c2e);flex-shrink:0;
+  }
+  .tbbtn{
+    padding:6px 12px;border-radius:6px;border:1px solid transparent;
+    font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;
+    cursor:pointer;transition:all .18s;background:transparent;color:var(--muted);
+  }
+  .tbbtn.act{
+    background:linear-gradient(135deg,#059c72,#10d9a0);color:#0a1a14;
+    border-color:transparent;box-shadow:0 2px 12px rgba(16,217,160,.35);font-weight:800;
+  }
+  .tbbtn:hover:not(.act){border-color:rgba(16,217,160,.3);color:var(--accent);background:rgba(16,217,160,.06);}
+  .tbbtn-print{
+    margin-left:6px;background:rgba(168,85,247,.1)!important;
+    color:var(--accent2)!important;border:1px solid rgba(168,85,247,.3)!important;
+  }
+  .tbbtn-print:hover{
+    background:rgba(168,85,247,.18)!important;
+    border-color:var(--accent2)!important;
+    box-shadow:0 2px 12px var(--glow-purple)!important;
+  }
+  .tbr{margin-left:auto;display:flex;gap:7px;align-items:center;}
+  .ssel{
+    width:auto;padding:6px 26px 6px 8px;font-size:.73rem;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a8a'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 6px center;
+  }
+  .rcnt{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);white-space:nowrap;}
+  .exbtn{
+    padding:6px 10px;background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;font-size:.73rem;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all .18s;
+  }
+  .exbtn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(168,85,247,.08);}
+
+  /* ── TABLE ── */
+  .twrap{flex:1;overflow:auto;padding:12px 18px;background:var(--bg);}
+  .twrap::-webkit-scrollbar{width:4px;height:4px;}
+  .twrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  table{width:100%;border-collapse:collapse;font-size:.78rem;}
+  thead tr{
+    background:linear-gradient(90deg,#161f36,#1a2240);
+    position:sticky;top:0;z-index:2;
+    border-bottom:2px solid rgba(16,217,160,.25);
+  }
+  th{
+    padding:10px 12px;text-align:left;font-size:.63rem;font-weight:700;
+    letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);
+    border-bottom:none;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s;
+  }
+  th:hover,th.srt{color:#34eba8;text-shadow:0 0 8px rgba(16,217,160,.4);}
+  tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.015);}
+  tbody tr:hover{background:rgba(16,217,160,.05);}
+  td{padding:9px 12px;vertical-align:middle;font-family:'DM Mono',monospace;font-size:.76rem;color:#bfcce8;}
+  td.tdsc{font-family:'Syne',sans-serif;font-size:.78rem;color:var(--text);}
+  .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:.62rem;font-weight:700;white-space:nowrap;}
+  .bd{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.25);}
+  .bm{background:rgba(16,217,160,.1);color:var(--accent);border:1px solid rgba(16,217,160,.25);}
+  .bdt{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.25);}
+  .vv{color:var(--accent);font-weight:700;text-shadow:0 0 6px rgba(16,217,160,.25);}
+  .nor td{text-align:center;color:var(--muted);padding:40px;font-size:.8rem;}
+
+  /* ── PAGINATION ── */
+  .pager{
+    padding:9px 18px;border-top:1px solid var(--border);
+    display:flex;align-items:center;gap:5px;justify-content:flex-end;
+    background:linear-gradient(90deg,#13192a,#161c2e);flex-shrink:0;
+  }
+  .pgb{
+    padding:4px 9px;background:var(--surface2);border:1px solid var(--border);
+    color:var(--muted);border-radius:5px;cursor:pointer;font-size:.73rem;
+    font-family:'DM Mono',monospace;transition:all .15s;
+  }
+  .pgb:hover,.pgb.act{
+    border-color:var(--accent);color:var(--accent);
+    background:rgba(16,217,160,.1);box-shadow:0 0 8px var(--glow-teal);
+  }
+  .pgb:disabled{opacity:.25;cursor:not-allowed;}
+  .pgi{font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;}
+
+  /* ── SUMMARY ── */
+  .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:16px 18px;overflow-y:auto;flex:1;background:var(--bg);}
+  .scard{
+    background:linear-gradient(145deg,#161c2e,#131828);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;transition:all .22s;
+  }
+  .scard:hover{
+    border-color:var(--accent);
+    box-shadow:0 4px 24px var(--glow-teal);
+    transform:translateY(-2px);
+  }
+  .scard h3{
+    font-size:.8rem;font-weight:700;margin-bottom:10px;
+    color:var(--text);display:flex;justify-content:space-between;align-items:center;
+  }
+  .scard h3 span{font-size:.64rem;color:var(--muted);font-weight:400;}
+  .srow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.74rem;}
+  .srow:last-child{border-bottom:none;}
+  .sk{color:var(--muted);font-family:'DM Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:58%;}
+  .sv{color:var(--accent);font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;}
+
+  /* ── CHARTS ── */
+  .carea{flex:1;overflow-y:auto;padding:16px 18px;background:var(--bg);}
+  .ccard{
+    background:linear-gradient(145deg,#161c2e,#131828);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .ccard h3{font-size:.7rem;font-weight:700;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+  .bchart{display:flex;flex-direction:column;gap:7px;}
+  .brow{display:flex;align-items:center;gap:10px;}
+  .blbl{width:140px;min-width:80px;font-size:.7rem;color:var(--text);font-family:'DM Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .btrk{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:18px;overflow:hidden;}
+  .bfil{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;padding-right:6px;justify-content:flex-end;min-width:2px;}
+  .bfil span{font-size:.65rem;font-family:'DM Mono',monospace;color:rgba(0,0,0,.75);font-weight:700;}
+  .ca{background:linear-gradient(90deg,#059c72,#10d9a0);}
+  .cb{background:linear-gradient(90deg,#7c3aed,#a855f7);}
+  .cg{background:linear-gradient(90deg,#d97706,#fbbf24);}
+
+  /* ── EMPTY ── */
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:40px;text-align:center;}
+  .empty .ei{font-size:3rem;opacity:.25;}
+  .empty h2{font-size:1.1rem;color:var(--text);}
+  .empty p{font-size:.8rem;max-width:290px;line-height:1.6;}
+
+  @media(max-width:680px){.main{flex-direction:column;height:auto;}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}.sb{max-height:360px;}}
+
+  /* ── PRINT MODAL ── */
+  .print-modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+    z-index:9999;display:flex;align-items:center;justify-content:center;
+    animation:fadeInOverlay .18s ease;
+  }
+  @keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+  .print-modal{
+    background:linear-gradient(145deg,#161c2e,#131828);
+    border:1px solid rgba(16,217,160,.25);border-radius:14px;
+    padding:28px 28px 22px;width:420px;max-width:94vw;
+    box-shadow:0 8px 48px rgba(0,0,0,.6),0 0 0 1px rgba(16,217,160,.08);
+    animation:slideUpModal .2s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes slideUpModal{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .print-modal h2{
+    font-size:1rem;font-weight:800;margin-bottom:4px;
+    background:linear-gradient(90deg,#10d9a0,#a855f7);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .print-modal p{font-size:.73rem;color:var(--muted);margin-bottom:20px;}
+  .print-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+  .print-opt{
+    display:flex;align-items:center;gap:14px;
+    background:rgba(255,255,255,.03);border:1px solid var(--border);
+    border-radius:10px;padding:13px 16px;cursor:pointer;transition:all .18s;
+  }
+  .print-opt:hover{
+    border-color:var(--accent);background:rgba(16,217,160,.06);
+    box-shadow:0 0 16px var(--glow-teal);transform:translateX(3px);
+  }
+  .print-opt .poi{font-size:1.6rem;line-height:1;flex-shrink:0;}
+  .print-opt .pot{display:flex;flex-direction:column;}
+  .print-opt .pot strong{font-size:.84rem;font-weight:700;color:var(--text);}
+  .print-opt .pot span{font-size:.68rem;color:var(--muted);margin-top:2px;}
+  .print-modal-cancel{
+    width:100%;padding:9px;background:transparent;border:1px solid var(--border);
+    color:var(--muted);border-radius:7px;font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;
+    cursor:pointer;transition:all .18s;
+  }
+  .print-modal-cancel:hover{border-color:var(--danger);color:var(--danger);background:rgba(244,63,94,.06);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <h1>FANZ <span>Spinning Mills</span></h1>
+    <p>Cost Center Wise Consumption Dashboard</p>
+  </div>
+  <div class="hstats" id="hstats"></div>
+</header>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sb">
+      <div class="slbl">Load Data</div>
+
+      <!-- GOOGLE DRIVE AUTO-FETCH -->
+      <div class="gdbox" id="gdbox">
+        <div class="gdt">☁️ Load from Google Drive</div>
+        <div class="gds" id="gd-status">Sign in with Google to load whatever you have access to.</div>
+        <button class="gdbtn" id="btn_gdrive" onclick="connectGoogleDrive()">🔵 Connect Google Drive</button>
+        <button class="gdbtn small" id="btn_gdrive_refresh" onclick="connectGoogleDrive()" style="display:none">🔄 Refresh from Drive</button>
+        <div id="gd-debug" style="display:none;margin-top:8px;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);max-height:160px;overflow-y:auto;border-top:1px solid var(--border);padding-top:6px;"></div>
+      </div>
+      <div class="gddiv">OR</div>
+
+      <!-- Drop zone (visual only — drag target) -->
+      <div class="dzone" id="dzone">
+        <div class="di">📂</div>
+        <strong>Drag &amp; Drop Excel files here</strong>
+        <p>or use buttons below to browse</p>
+      </div>
+
+      <!-- TWO COMPLETELY SEPARATE HIDDEN INPUTS -->
+      <input id="inp_folder" type="file" webkitdirectory multiple style="display:none">
+      <input id="inp_files"  type="file" multiple accept=".xlsx,.xls" style="display:none">
+
+      <div class="lbtns">
+        <button class="btn bfolder" id="btn_folder">📁 Open Folder</button>
+        <button class="btn bfiles"  id="btn_files">📄 Pick Files</button>
+      </div>
+
+      <div id="filecount"></div>
+      <div class="slbl">Filters</div>
+      <div class="fb"><label>Search Item</label><div class="sw"><input type="text" id="fSearch" placeholder="Name or code…"></div></div>
+      <div class="fb">
+        <label>Date Range</label>
+        <div class="dr-wrap">
+          <div class="dr-row">
+            <span>From</span>
+            <input type="date" id="fDateFrom" title="Start date">
+          </div>
+          <div class="dr-row">
+            <span>To&nbsp;&nbsp;&nbsp;</span>
+            <input type="date" id="fDateTo" title="End date">
+          </div>
+          <div class="dr-presets">
+            <button class="drp" onclick="setPreset('today')">Today</button>
+            <button class="drp" onclick="setPreset('week')">This Week</button>
+            <button class="drp" onclick="setPreset('month')">This Month</button>
+            <button class="drp" onclick="setPreset('all')">All</button>
+          </div>
+        </div>
+      </div>
+      <div class="fb"><label>Department</label><select id="fDept"><option value="">All Departments</option></select></div>
+      <div class="fb"><label>Machine No.</label><select id="fMach"><option value="">All Machines</option></select></div>
+      <button class="btn bclear" onclick="clearF()">↺ Clear Filters</button>
+    </div>
+  </aside>
+
+  <div class="content" id="content">
+    <div class="empty">
+      <div class="ei">📊</div>
+      <h2>No Data Loaded</h2>
+      <p>Click <strong>Open Folder</strong> to load your entire reports folder at once, or <strong>Pick Files</strong> to choose individual files.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var allRows=[], filtRows=[], loadedMap={};
+var sCol='date', sDir=1, tab='table', page=1;
+var PG=50;
+
+// ── BUTTON CLICKS ─────────────────────────────
+document.getElementById('btn_folder').onclick = function(){
+  document.getElementById('inp_folder').click();
+};
+document.getElementById('btn_files').onclick = function(){
+  document.getElementById('inp_files').click();
+};
+
+// Folder picker
+document.getElementById('inp_folder').onchange = function(){
+  var files = filterXlsx(this.files);
+  if(!files.length){ alert('No .xlsx or .xls files found in that folder.'); this.value=''; return; }
+  processFiles(files);
+  this.value='';
+};
+
+// Individual files picker
+document.getElementById('inp_files').onchange = function(){
+  var files = filterXlsx(this.files);
+  if(files.length) processFiles(files);
+  this.value='';
+};
+
+function filterXlsx(fileList){
+  return Array.from(fileList).filter(function(f){
+    var n=f.name.toLowerCase();
+    return n.endsWith('.xlsx')||n.endsWith('.xls');
+  });
+}
+
+// ── DRAG & DROP ───────────────────────────────
+var dz=document.getElementById('dzone');
+document.body.addEventListener('dragover',function(e){e.preventDefault();});
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
+dz.addEventListener('drop',function(e){
+  e.preventDefault(); dz.classList.remove('over');
+  var files=filterXlsx(e.dataTransfer.files);
+  if(files.length) processFiles(files);
+  else alert('No Excel files found in the dropped items.');
+});
+
+// ── PROCESS FILES ─────────────────────────────
+function processFiles(files){
+  var todo=[], done=0;
+  files.forEach(function(f){ if(!loadedMap.hasOwnProperty(f.name)) todo.push(f); });
+  if(!todo.length){ alert('All selected files are already loaded.'); return; }
+  todo.forEach(function(f){
+    readXlsx(f, function(rows, err){
+      if(err){ alert('Error in '+f.name+': '+err); }
+      else { allRows=allRows.concat(rows); loadedMap[f.name]=rows.length; }
+      done++;
+      if(done===todo.length){ renderFileList(); rebuildFilters(); applyFilters(); }
+    });
+  });
+}
+
+// ====================================================================
+// GOOGLE DRIVE FOLDER AUTO-FETCH
+// Access is controlled entirely by real Google Drive sharing permissions.
+// A person must (a) be signed in with Google, and (b) actually have Drive
+// access to this folder — otherwise the Drive API returns nothing.
+// ====================================================================
+const GOOGLE_CLIENT_ID = '1066649642648-mub3s153soti1ji0toa8h6ivrlo26rj1.apps.googleusercontent.com';
+const DRIVE_FOLDER_ID  = '1NOxlQG77ytUySjGYDK_8H6apUXLGwBRm';   // the ID from the folder's share URL
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
+
+let _driveTokenClient = null;
+let _driveAccessToken = null;
+
+function _setDriveStatus(msg){
+  const el = document.getElementById('gd-status');
+  if(el) el.textContent = msg;
+}
+
+function initDriveAuth(){
+  if(!window.google || !google.accounts || !google.accounts.oauth2){
+    setTimeout(initDriveAuth, 300); // library still loading, retry shortly
+    return;
+  }
+  _driveTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: (tokenResponse) => {
+      if(tokenResponse && tokenResponse.access_token){
+        _driveAccessToken = tokenResponse.access_token;
+        loadFilesFromDrive();
+      } else {
+        _setDriveStatus('⚠️ Google sign-in did not complete. Please try again.');
+      }
+    }
+  });
+}
+
+function connectGoogleDrive(){
+  if(GOOGLE_CLIENT_ID.indexOf('PASTE_') === 0 || DRIVE_FOLDER_ID.indexOf('PASTE_') === 0){
+    _setDriveStatus('⚠️ Google Drive isn\'t configured yet — the Client ID / Folder ID placeholders in the code need to be filled in.');
+    return;
+  }
+  _setDriveStatus('⏳ Waiting for Google sign-in…');
+  if(!_driveTokenClient){
+    initDriveAuth();
+    setTimeout(connectGoogleDrive, 500);
+    return;
+  }
+  // If we already have a token this session, try to refresh silently first
+  _driveTokenClient.requestAccessToken({ prompt: _driveAccessToken ? '' : 'consent' });
+}
+
+// Recursively lists every file under a given Drive folder ID, descending into subfolders.
+async function _listDriveFilesRecursive(folderId, depth){
+  if(depth > 6) return []; // safety cap against pathological folder nesting
+  const listUrl = 'https://www.googleapis.com/drive/v3/files?q=' +
+    encodeURIComponent(`'${folderId}' in parents and trashed=false`) +
+    '&fields=' + encodeURIComponent('files(id,name,mimeType,modifiedTime)') +
+    '&pageSize=1000&orderBy=modifiedTime desc';
+  const res = await fetch(listUrl, { headers: { Authorization: 'Bearer ' + _driveAccessToken } });
+
+  if(res.status === 401){
+    _driveAccessToken = null;
+    throw new Error('SESSION_EXPIRED');
+  }
+  if(!res.ok){
+    const errBody = await res.json().catch(()=>({}));
+    throw new Error((errBody && errBody.error && errBody.error.message) || ('HTTP '+res.status));
+  }
+
+  const data = await res.json();
+  const entries = data.files || [];
+  const subfolders = entries.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+  const here = entries.filter(f => f.mimeType !== 'application/vnd.google-apps.folder');
+
+  let nested = [];
+  for(const sub of subfolders){
+    const subFiles = await _listDriveFilesRecursive(sub.id, depth + 1);
+    nested = nested.concat(subFiles);
+  }
+  return here.concat(nested);
+}
+
+function _renderDriveDebug(lines){
+  const el = document.getElementById('gd-debug');
+  if(!el) return;
+  if(!lines.length){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  el.innerHTML = lines.map(l => '<div>'+l.replace(/</g,'&lt;')+'</div>').join('');
+}
+
+async function loadFilesFromDrive(){
+  _setDriveStatus('⏳ Checking your Drive access…');
+  _renderDriveDebug([]);
+  try{
+    let allEntries;
+    try{
+      allEntries = await _listDriveFilesRecursive(DRIVE_FOLDER_ID, 0);
+    }catch(e){
+      if(e.message === 'SESSION_EXPIRED'){
+        _setDriveStatus('⚠️ Your session expired — click "Connect Google Drive" again.');
+        return;
+      }
+      throw e;
+    }
+
+    // Log every single entry the API actually returned, so any file that
+    // gets excluded downstream is visible instead of silently vanishing.
+    const debugLines = ['Found ' + allEntries.length + ' item(s) in folder:'];
+    allEntries.forEach(f => debugLines.push('• ' + f.name + '  [' + f.mimeType + ']'));
+
+    const excelFiles = allEntries.filter(f =>
+      /\.(xlsx|xls|xlsm)$/i.test(f.name) ||
+      f.mimeType === 'application/vnd.google-apps.spreadsheet' ||
+      f.mimeType === 'application/vnd.ms-excel' ||
+      f.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+
+    const notMatched = allEntries.filter(f => excelFiles.indexOf(f) === -1 && f.mimeType !== 'application/vnd.google-apps.folder');
+    if(notMatched.length){
+      debugLines.push('Not recognized as a spreadsheet, skipped:');
+      notMatched.forEach(f => debugLines.push('✗ ' + f.name + '  [' + f.mimeType + ']'));
+    }
+
+    if(excelFiles.length === 0){
+      _setDriveStatus('⚠️ No Excel files visible in that folder. Either it\'s empty, or you don\'t have Drive access to it — ask your admin to share the folder with your Google account.');
+      _renderDriveDebug(debugLines);
+      return;
+    }
+
+    _setDriveStatus('⏳ Downloading ' + excelFiles.length + ' file(s) from Drive…');
+    const files = [];
+    const failed = [];
+    for(const f of excelFiles){
+      let downloadUrl;
+      if(f.mimeType === 'application/vnd.google-apps.spreadsheet'){
+        downloadUrl = `https://www.googleapis.com/drive/v3/files/${f.id}/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`;
+      } else {
+        downloadUrl = `https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`;
+      }
+      try{
+        const fileRes = await fetch(downloadUrl, { headers: { Authorization: 'Bearer ' + _driveAccessToken } });
+        if(!fileRes.ok){
+          failed.push(f.name + ' — HTTP ' + fileRes.status);
+          continue; // skip this file, keep going with the rest
+        }
+        const blob = await fileRes.blob();
+        const name = /\.(xlsx|xls|xlsm)$/i.test(f.name) ? f.name : (f.name + '.xlsx');
+        files.push(new File([blob], name, { type: blob.type }));
+      }catch(fileErr){
+        failed.push(f.name + ' — ' + fileErr.message);
+      }
+    }
+
+    if(failed.length){
+      debugLines.push('Matched but failed to download:');
+      failed.forEach(l => debugLines.push('✗ ' + l));
+    }
+    debugLines.push('Successfully loaded: ' + files.length + ' / ' + excelFiles.length + ' matched file(s)');
+    _renderDriveDebug(debugLines);
+
+    if(files.length === 0){
+      _setDriveStatus('⚠️ Found files but couldn\'t download any of them. See details below.');
+      return;
+    }
+
+    _setDriveStatus('✅ Loaded ' + files.length + ' file(s) from Google Drive' + (failed.length ? (' (' + failed.length + ' failed — see details below)') : ''));
+    document.getElementById('btn_gdrive').style.display = 'none';
+    document.getElementById('btn_gdrive_refresh').style.display = '';
+    processFiles(files);
+  }catch(err){
+    _setDriveStatus('⚠️ Drive access failed (' + err.message + '). Please upload manually below if this continues.');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{ initDriveAuth(); });
+
+function readXlsx(file, cb){
+  var fr=new FileReader();
+  fr.onerror=function(){ cb([],'File read error'); };
+  fr.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+
+      // Department code → name mapping
+      var DEPT_MAP={
+        '1-00':'STAFF','1-01':'PLANT ADMINISTRATION','1-02':'LAB/QUALITY',
+        '1-03':'PRODUCTION','1-04':'BLOW ROOM','1-05':'SECURITY',
+        '1-06':'ISO','1-07':'MISC','1-08':'GENERAL STORES',
+        '1-09':'OUT FOR SALE & RETURN','1-99':'DEAD STOCK',
+        '2-00':'SHIFT GENERAL','2-01':'BLOW ROOM','2-02':'CARDING',
+        '2-03':'COMBER','2-04':'DRAWING SIMPLEX','2-05':'RING',
+        '2-06':'RING 2','2-07':'AUTO CONE','2-08':'PACKING & Q/C',
+        '2-09':'POWER HOUSE (D)','2-10':'POWER GENERATION','2-11':'ELECTRIC',
+        '2-12':'AIR CONDITIONING','2-13':'WORKSHOP','2-14':'AIR COMPRESSOR',
+        '2-15':'ROLLER COVER','2-16':'DOUBLING','2-17':'KNITTING',
+        '2-21':'AUTO CORO','2-29':'REPAIR & MAINTENANCE','2-30':'OUT (SALE)',
+        '2-31':'GULSHAN SPINNING (GFSM)','2-32':'FANZ SPINNING MILLS',
+        '2-33':'CIVIL WORK','2-34':'MILLS EXTENSION',
+        '3-00':'CAPITAL ITEMS','3-01':'BLOW ROOM CAPITAL','3-02':'CARDING CAPITAL',
+        '3-03':'COMBER CAPITAL','3-04':'DRAWING SIMPLEX CAPITAL','3-05':'RING CAPITAL',
+        '3-06':'AUTO CONE CAPITAL','3-07':'ELECTRIC CAPITAL',
+        '3-08':'AIR CONDITION CAPITAL','3-09':'ROLLER COVER CAPITAL',
+        '4-00':'SHIFT B','4-01':'BLOW ROOM','4-02':'CARDING','4-03':'COMBER',
+        '4-04':'DRAWING SIMPLEX','4-05':'RING','4-06':'AUTO CONE','4-10':'RING LINE 2',
+        '5-00':'SHIFT C','5-01':'BLOW ROOM','5-02':'CARDING','5-03':'COMBER',
+        '5-04':'DRAWING SIMPLEX','5-05':'RING','5-06':'AUTO CONE','5-08':'RING'
+      };
+
+      // Column mapping (0-based):
+      // B=1 date | D=3 dept code | R=17 qty | V=21 value | AH=33 description
+      var CB=1, CD=3, CR=17, CV=21, CAH=33, CAI=34;
+
+      var rows=[];
+      for(var i=0;i<raw.length;i++){
+        var r=raw[i];
+        var desc=String(r[CAH]||'').trim();
+        var deptCode=String(r[CD]||'').trim();
+        var dept=DEPT_MAP[deptCode]?(deptCode+' '+DEPT_MAP[deptCode]):deptCode;
+        var qty =parseFloat(r[CR])||0;
+        var val =parseFloat(r[CV])||0;
+        var rate=(qty!==0)?(val/qty):0;
+
+        // Date from column B — stored as string "DD-Mon-YY" e.g. "01-Jul-25"
+        var rawDate=r[CB];
+        var date='';
+        if(rawDate){
+          if(rawDate instanceof Date){
+            var dd=String(rawDate.getDate()).padStart(2,'0');
+            var mm=String(rawDate.getMonth()+1).padStart(2,'0');
+            var yyyy=rawDate.getFullYear();
+            date=dd+'/'+mm+'/'+yyyy;
+          } else {
+            var ds=String(rawDate).trim();
+            var MONTHS={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
+                        Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+            var pm=ds.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2,4})$/);
+            if(pm){
+              var pdd=pm[1].padStart(2,'0');
+              var pmm=MONTHS[pm[2]]||'01';
+              var pyy=pm[3].length===2?('20'+pm[3]):pm[3];
+              date=pdd+'/'+pmm+'/'+pyy;
+            } else {
+              date=ds;
+            }
+          }
+        }
+
+        // Skip blank description rows
+        if(!desc) continue;
+        // Skip header rows
+        var du=desc.toUpperCase();
+        if(du==='DESCRIPTION'||du==='PRODUCT DESCRIPTION'||du==='PARTICULARS'||du==='IT_NAME') continue;
+        // Skip pure total/summary rows with no values
+        if(du.indexOf('TOTAL')!==-1&&qty===0&&val===0) continue;
+        // Need at least some data
+        if(qty===0&&val===0) continue;
+
+        rows.push({
+          date:date, itemCode:'',
+          itemDesc:desc, unit:'',
+          qty:qty, rate:rate, value:val,
+          dept:dept, machine:String(r[CAI]||'').trim(),
+          file:file.name
+        });
+      }
+      cb(rows,null);
+    }catch(ex){cb([],ex.message);}
+  };
+  fr.readAsArrayBuffer(file);
+}
+
+function dateFromName(n){
+  var m=n.match(/(\d{1,2})[_\-](\d{1,2})[_\-](\d{2,4})/);
+  if(!m) return n.replace(/\.xlsx?$/i,'');
+  var d=m[1].padStart(2,'0'),mo=m[2].padStart(2,'0'),y=m[3];
+  if(y.length===2) y='20'+y;
+  return d+'/'+mo+'/'+y;
+}
+
+// ── FILE LIST ─────────────────────────────────
+function renderFileList(){
+  var names=Object.keys(loadedMap);
+  var el=document.getElementById("filecount");
+  if(!names.length){el.innerHTML="";return;}
+  var totalRows=names.reduce(function(s,n){return s+loadedMap[n];},0);
+  el.innerHTML='<div class="fcount-badge"><span class="fcount-dot"></span><span class="fcount-text">'+names.length+' file'+(names.length>1?"s":"")+' loaded &mdash; '+totalRows.toLocaleString()+' rows</span><span class="fcount-clear" id="clearAllFiles">✕ Clear All</span></div>';
+  document.getElementById("clearAllFiles").onclick=function(){allRows=[];loadedMap={};document.getElementById("filecount").innerHTML="";rebuildFilters();applyFilters();};
+}
+function removeFile(n){
+  allRows=allRows.filter(function(r){return r.file!==n;});
+  delete loadedMap[n];
+  renderFileList();rebuildFilters();applyFilters();
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// ── FILTERS ───────────────────────────────────
+// Convert DD/MM/YYYY -> YYYY-MM-DD for comparison
+function toISO(d){
+  if(!d) return '';
+  var p=d.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(!p) return '';
+  return p[3]+'-'+p[2].padStart(2,'0')+'-'+p[1].padStart(2,'0');
+}
+
+function setPreset(p){
+  document.querySelectorAll('.drp').forEach(function(b){b.classList.remove('on');});
+  event.target.classList.add('on');
+  var now=new Date(), y=now.getFullYear(), m=now.getMonth(), day=now.getDate();
+  var from='', to='';
+  if(p==='today'){
+    from=to=isoDate(now);
+  } else if(p==='week'){
+    var dow=now.getDay()||7; // Mon=1
+    var mon=new Date(now); mon.setDate(day-(dow-1));
+    var sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    from=isoDate(mon); to=isoDate(sun);
+  } else if(p==='month'){
+    from=isoDate(new Date(y,m,1)); to=isoDate(new Date(y,m+1,0));
+  } else {
+    // all — clear range
+    document.getElementById('fDateFrom').value='';
+    document.getElementById('fDateTo').value='';
+    applyFilters(); return;
+  }
+  document.getElementById('fDateFrom').value=from;
+  document.getElementById('fDateTo').value=to;
+  applyFilters();
+}
+function isoDate(d){
+  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+}
+
+function uniq(arr){return arr.filter(function(v,i,a){return a.indexOf(v)===i;});}
+
+function rebuildFilters(){
+  fillSel('fDept',  uniq(allRows.map(function(r){return r.dept;}).filter(Boolean)).sort());
+  fillSel('fMach',  uniq(allRows.map(function(r){return r.machine;}).filter(Boolean)).sort());
+  // auto-set date range min/max from data
+  var dates=uniq(allRows.map(function(r){return r.date;})).map(toISO).filter(Boolean).sort();
+  if(dates.length){
+    var fromEl=document.getElementById('fDateFrom');
+    var toEl=document.getElementById('fDateTo');
+    if(!fromEl.value) fromEl.min=dates[0];
+    if(!toEl.value)   toEl.max=dates[dates.length-1];
+    fromEl.min=dates[0]; fromEl.max=dates[dates.length-1];
+    toEl.min=dates[0];   toEl.max=dates[dates.length-1];
+  }
+}
+function fillSel(id,vals){
+  var s=document.getElementById(id), cur=s.value, f=s.options[0].outerHTML;
+  s.innerHTML=f+vals.map(function(v){return '<option value="'+esc(v)+'">'+esc(v)+'</option>';}).join('');
+  if(vals.indexOf(cur)!==-1) s.value=cur;
+}
+
+function applyFilters(){
+  var q=document.getElementById('fSearch').value.toLowerCase().trim();
+  var fr=document.getElementById('fDateFrom').value; // YYYY-MM-DD or ''
+  var ft=document.getElementById('fDateTo').value;
+  var fp=document.getElementById('fDept').value;
+  var fm=document.getElementById('fMach').value;
+  filtRows=allRows.filter(function(r){
+    if(fr||ft){
+      var rd=toISO(r.date);
+      if(rd){
+        if(fr&&rd<fr) return false;
+        if(ft&&rd>ft) return false;
+      }
+    }
+    if(fp&&r.dept!==fp) return false;
+    if(fm&&r.machine!==fm) return false;
+    if(q&&r.itemDesc.toLowerCase().indexOf(q)===-1) return false;
+    return true;
+  });
+  if(sCol){
+    var sc=sCol,sd=sDir;
+    filtRows.sort(function(a,b){
+      var av=a[sc],bv=b[sc];
+      return typeof av==='number'?(av-bv)*sd:String(av).localeCompare(String(bv))*sd;
+    });
+  }
+  page=1; renderStats(); render();
+}
+function clearF(){
+  ['fSearch','fDept','fMach'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el.tagName==='SELECT') el.value=''; else el.value='';
+  });
+  document.getElementById('fDateFrom').value='';
+  document.getElementById('fDateTo').value='';
+  document.querySelectorAll('.drp').forEach(function(b){b.classList.remove('on');});
+  applyFilters();
+}
+['fSearch','fDept','fMach'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',applyFilters);
+  document.getElementById(id).addEventListener('change',applyFilters);
+});
+document.getElementById('fDateFrom').addEventListener('change',applyFilters);
+document.getElementById('fDateTo').addEventListener('change',applyFilters);
+
+// ── STATS ─────────────────────────────────────
+function renderStats(){
+  var tot=filtRows.reduce(function(s,r){return s+r.value;},0);
+  document.getElementById('hstats').innerHTML=
+    chip(filtRows.length.toLocaleString(),'Records')+
+    chip(uniq(filtRows.map(function(r){return r.date;})).length,'Dates')+
+    chip(uniq(filtRows.map(function(r){return r.dept;})).length,'Depts')+
+    chip('₨'+(tot/1000).toFixed(1)+'K','Total Value');
+}
+function chip(v,l){return '<div class="chip"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
+
+// ── RENDER ────────────────────────────────────
+function render(){
+  var ca=document.getElementById('content');
+  if(!allRows.length){
+    ca.innerHTML='<div class="empty"><div class="ei">📊</div><h2>No Data Loaded</h2><p>Click <strong>Open Folder</strong> to load your entire reports folder, or <strong>Pick Files</strong> to select specific files.</p></div>';
+    return;
+  }
+  if(tab==='table') renderTable(ca);
+  else if(tab==='summary') renderSummary(ca);
+  else renderCharts(ca);
+}
+
+function tabsHtml(){
+  var tabs=['table','summary','charts'];
+  var lbl={table:'📋 Table',summary:'🗂 Summary',charts:'📊 Charts'};
+  return tabs.map(function(t){
+    return '<button class="tbbtn'+(tab===t?' act':'')+'" onclick="switchTab(\''+t+'\')">'+lbl[t]+'</button>';
+  }).join('')+'<button class="tbbtn tbbtn-print" onclick="printReport()">🖨️ Print / PDF</button>';
+}
+function switchTab(t){tab=t;page=1;render();}
+
+// ── PRINT REPORT MODAL ────────────────────────
+function printReport(){
+  if(!filtRows.length){ alert('No data to print. Please load files and apply filters first.'); return; }
+
+  // Remove any existing modal
+  var ex=document.getElementById('printModalOverlay');
+  if(ex) ex.remove();
+
+  var overlay=document.createElement('div');
+  overlay.id='printModalOverlay';
+  overlay.className='print-modal-overlay';
+  overlay.innerHTML=
+    '<div class="print-modal">'+
+      '<h2>🖨️ Select Report Type</h2>'+
+      '<p>Choose how you want the report to be grouped and organised</p>'+
+      '<div class="print-options">'+
+        '<div class="print-opt" onclick="closePrintModal();buildReport(\'date\')">'+
+          '<div class="poi">📅</div>'+
+          '<div class="pot"><strong>Date Wise</strong><span>Records grouped by date, subtotal per day</span></div>'+
+        '</div>'+
+        '<div class="print-opt" onclick="closePrintModal();buildReport(\'dept\')">'+
+          '<div class="poi">🏭</div>'+
+          '<div class="pot"><strong>Department Wise</strong><span>Records grouped by department, subtotal per department</span></div>'+
+        '</div>'+
+        '<div class="print-opt" onclick="closePrintModal();buildReport(\'item\')">'+
+          '<div class="poi">📦</div>'+
+          '<div class="pot"><strong>Item Wise</strong><span>Records grouped by item / description, subtotal per item</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<button class="print-modal-cancel" onclick="closePrintModal()">✕ Cancel</button>'+
+    '</div>';
+
+  // Close on overlay background click
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) closePrintModal(); });
+  document.body.appendChild(overlay);
+}
+
+function closePrintModal(){
+  var el=document.getElementById('printModalOverlay');
+  if(el) el.remove();
+}
+
+// ── SHARED PRINT HELPERS ──────────────────────
+function buildFilterInfo(){
+  var filterInfo=[];
+  var fd=document.getElementById('fDateFrom').value, ft=document.getElementById('fDateTo').value;
+  if(fd||ft) filterInfo.push('Date: '+(fd||'start')+' → '+(ft||'end'));
+  var dp=document.getElementById('fDept').value; if(dp) filterInfo.push('Dept: '+dp);
+  var mp=document.getElementById('fMach').value; if(mp) filterInfo.push('Machine: '+mp);
+  var sp=document.getElementById('fSearch').value.trim(); if(sp) filterInfo.push('Search: "'+sp+'"');
+  return filterInfo;
+}
+
+function printedOnStr(){
+  var now=new Date();
+  return now.getDate().toString().padStart(2,'0')+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getFullYear()+
+    ' '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+}
+
+function printBaseStyles(){
+  return '@page{size:A4 landscape;margin:15mm 12mm;}'+
+    '*{box-sizing:border-box;margin:0;padding:0;}'+
+    'body{font-family:Arial,sans-serif;font-size:9pt;color:#111;background:#fff;}'+
+    '.report-header{border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;}'+
+    '.report-header .left h1{font-size:16pt;font-weight:bold;letter-spacing:.5px;}'+
+    '.report-header .left h2{font-size:10pt;font-weight:normal;color:#444;margin-top:2px;}'+
+    '.report-header .right{text-align:right;font-size:8pt;color:#555;line-height:1.6;}'+
+    '.filter-bar{background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:5px 10px;margin-bottom:10px;font-size:8pt;color:#444;display:flex;gap:16px;flex-wrap:wrap;}'+
+    '.filter-bar span{font-weight:bold;color:#000;}'+
+    '.summary-chips{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}'+
+    '.schip{border:1px solid #ddd;border-radius:4px;padding:5px 12px;text-align:center;min-width:100px;}'+
+    '.schip .sv{font-size:11pt;font-weight:bold;color:#000;}'+
+    '.schip .sl{font-size:7.5pt;color:#666;margin-top:1px;}'+
+    'table{width:100%;border-collapse:collapse;font-size:8.5pt;}'+
+    'thead tr{background:#222;color:#fff;}'+
+    'th{padding:6px 8px;text-align:left;font-weight:bold;font-size:7.5pt;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}'+
+    'tbody tr{border-bottom:1px solid #e8e8e8;}'+
+    'td{padding:5px 8px;vertical-align:middle;}'+
+    'td.num{text-align:right;font-family:monospace;}'+
+    'td.val{font-weight:bold;color:#b87800;}'+
+    '.group-header td{background:#2a3a5a;color:#fff;font-weight:bold;font-size:8.5pt;padding:7px 8px;border-top:2px solid #aaa;}'+
+    '.subtotal td{background:#eef2f7;font-weight:bold;font-size:8pt;border-top:1px solid #bbb;}'+
+    '.subtotal td.num{text-align:right;font-family:monospace;}'+
+    '.grand-total td{background:#222;color:#fff;font-weight:bold;font-size:9pt;padding:7px 8px;border-top:3px solid #000;}'+
+    '.grand-total td.num{text-align:right;font-family:monospace;}'+
+    '.footer{margin-top:14px;border-top:1px solid #ccc;padding-top:6px;font-size:7.5pt;color:#888;display:flex;justify-content:space-between;}'+
+    '@media print{.no-print{display:none!important;} body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
+}
+
+function openPrintWindow(html){
+  var w=window.open('','_blank','width=1100,height=750');
+  if(!w){ alert('Pop-up blocked! Please allow pop-ups for this page and try again.'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
+function reportHeader(subtitle, printedOn, extra){
+  return '<div class="report-header">'+
+    '<div class="left"><h1>FANZ SPINNING MILLS</h1><h2>'+subtitle+'</h2></div>'+
+    '<div class="right">Printed: '+printedOn+'<br>'+(extra||'')+'</div>'+
+  '</div>';
+}
+
+function summaryChips(chips){
+  return '<div class="summary-chips">'+chips.map(function(c){
+    return '<div class="schip"><div class="sv">'+c[0]+'</div><div class="sl">'+c[1]+'</div></div>';
+  }).join('')+'</div>';
+}
+
+// ── BUILD REPORT ─────────────────────────────
+function buildReport(type){
+  if(type==='date')  printDateWise();
+  else if(type==='dept') printDeptWise();
+  else printItemWise();
+}
+
+// ── DATE WISE REPORT ─────────────────────────
+function printDateWise(){
+  var filterInfo=buildFilterInfo(), printedOn=printedOnStr();
+  var totalValue=filtRows.reduce(function(s,r){return s+r.value;},0);
+  var totalQty=filtRows.reduce(function(s,r){return s+r.qty;},0);
+
+  var byDate={};
+  filtRows.forEach(function(r){ if(!byDate[r.date]) byDate[r.date]=[]; byDate[r.date].push(r); });
+  var sortedDates=Object.keys(byDate).sort(function(a,b){ return toISO(a).localeCompare(toISO(b)); });
+
+  var tableRows='', grandQty=0, grandVal=0;
+  sortedDates.forEach(function(date){
+    var rows=byDate[date];
+    var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
+    var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
+    grandQty+=dtQty; grandVal+=dtVal;
+    tableRows+='<tr class="group-header"><td colspan="7">📅 '+date+
+      ' &nbsp;|&nbsp; '+rows.length+' items &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
+    rows.forEach(function(r){
+      tableRows+='<tr>'+
+        '<td>'+esc(r.itemDesc)+'</td><td>'+esc(r.unit)+'</td>'+
+        '<td class="num">'+r.qty.toLocaleString()+'</td>'+
+        '<td class="num">'+r.rate.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td class="num val">'+r.value.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td>'+esc(r.dept)+'</td><td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
+    });
+    tableRows+='<tr class="subtotal">'+
+      '<td colspan="2">Subtotal — '+date+'</td>'+
+      '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
+      '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td colspan="2"></td></tr>';
+  });
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Date Wise Report</title>'+
+    '<style>'+printBaseStyles()+'</style></head><body>'+
+    reportHeader('Cost Center Wise Consumption — DATE WISE',printedOn,'Records: '+filtRows.length+' | Dates: '+sortedDates.length)+
+    (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
+    summaryChips([
+      [filtRows.length.toLocaleString(),'Total Records'],
+      [sortedDates.length,'Dates'],
+      [uniq(filtRows.map(function(r){return r.dept;})).length,'Departments'],
+      [totalQty.toLocaleString(),'Total Qty'],
+      ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
+    ])+
+    '<table><thead><tr>'+
+      '<th>Description</th><th>Unit</th>'+
+      '<th style="text-align:right">Qty</th>'+
+      '<th style="text-align:right">Rate</th>'+
+      '<th style="text-align:right">Value (₨)</th>'+
+      '<th>Department</th><th>Machine</th>'+
+    '</tr></thead><tbody>'+tableRows+
+      '<tr class="grand-total"><td colspan="2">GRAND TOTAL</td>'+
+        '<td class="num">'+grandQty.toLocaleString()+'</td><td></td>'+
+        '<td class="num">'+grandVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td colspan="2"></td></tr>'+
+    '</tbody></table>'+
+    '<div class="footer"><span>FANZ Spinning Mills — Date Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  openPrintWindow(html);
+}
+
+// ── DEPARTMENT WISE REPORT ───────────────────
+function printDeptWise(){
+  var filterInfo=buildFilterInfo(), printedOn=printedOnStr();
+  var totalValue=filtRows.reduce(function(s,r){return s+r.value;},0);
+  var totalQty=filtRows.reduce(function(s,r){return s+r.qty;},0);
+
+  var byDept={};
+  filtRows.forEach(function(r){ var k=r.dept||'(Unknown)'; if(!byDept[k]) byDept[k]=[]; byDept[k].push(r); });
+  // sort depts by total value descending for summary, keep alpha for detail
+  var sortedDeptsByVal=Object.keys(byDept).sort(function(a,b){
+    var va=byDept[a].reduce(function(s,r){return s+r.value;},0);
+    var vb=byDept[b].reduce(function(s,r){return s+r.value;},0);
+    return vb-va;
+  });
+  var sortedDepts=Object.keys(byDept).sort();
+
+  // ── RUNNING MONTHLY TOTAL (from allRows for the chosen month) ──
+  // Determine the month/year from the selected date range (or from filtRows if no range set)
+  var fd=document.getElementById('fDateFrom').value;
+  var ft=document.getElementById('fDateTo').value;
+  // Pick a reference date: prefer the "from" date, fall back to first filtRow date
+  var refISO = fd || (filtRows.length ? toISO(filtRows[0].date) : '');
+  var monthLabel = '';
+  var monthlyDeptVal = {};
+  var monthlyGrandVal = 0;
+  if(refISO){
+    var refY = refISO.substring(0,4);
+    var refM = refISO.substring(5,7);
+    monthLabel = refY+'-'+refM; // e.g. "2025-03"
+    // Sum allRows for that calendar month across ALL departments (no other filters)
+    allRows.forEach(function(r){
+      var iso = toISO(r.date);
+      if(!iso) return;
+      if(iso.substring(0,7) !== monthLabel) return;
+      var k = r.dept||'(Unknown)';
+      monthlyDeptVal[k] = (monthlyDeptVal[k]||0) + r.value;
+      monthlyGrandVal += r.value;
+    });
+  }
+  // Format month label for display: "Mar 2025"
+  var monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var monthDisplayLabel = '';
+  if(monthLabel){
+    var mIdx = parseInt(monthLabel.substring(5,7),10)-1;
+    monthDisplayLabel = monthNames[mIdx]+' '+monthLabel.substring(0,4);
+  }
+
+  // ── SUMMARY TABLE ──
+  // Build a unified dept list: all depts that appear in the running month (from allRows),
+  // regardless of whether they have any records in the selected period.
+  var allMonthDepts = Object.keys(monthlyDeptVal);
+  // Also include any depts in filtRows that somehow aren't in monthlyDeptVal
+  Object.keys(byDept).forEach(function(d){ if(allMonthDepts.indexOf(d)===-1) allMonthDepts.push(d); });
+  // Sort by monthly value descending
+  allMonthDepts.sort(function(a,b){ return (monthlyDeptVal[b]||0)-(monthlyDeptVal[a]||0); });
+
+  var grandSumQty=0, grandSumVal=0;
+  var summaryRows='';
+  var sno=1;
+  allMonthDepts.forEach(function(dept){
+    var rows=byDept[dept]||[];
+    var dq=rows.reduce(function(s,r){return s+r.qty;},0);
+    var dv=rows.reduce(function(s,r){return s+r.value;},0);
+    grandSumQty+=dq; grandSumVal+=dv;
+    var monthlyVal = monthlyDeptVal[dept]||0;
+    var rowStyle = rows.length===0 ? ' style="opacity:0.7;background:#f9f9f9;"' : '';
+    summaryRows+='<tr'+rowStyle+'>'+
+      '<td class="num">'+sno+'</td>'+
+      '<td>'+esc(dept)+(rows.length===0?' <span style="font-size:7pt;color:#999;">(no activity in period)</span>':'')+'</td>'+
+      '<td class="num">'+(rows.length||'—')+'</td>'+
+      '<td class="num">'+(dq?dq.toLocaleString():'—')+'</td>'+
+      '<td class="num val">'+(dv?dv.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2}):'—')+'</td>'+
+      '<td class="num">'+(monthlyGrandVal?(monthlyVal/monthlyGrandVal*100).toFixed(1):0)+'%</td>'+
+      '<td class="num" style="color:#1a6b3c;font-weight:bold;">'+monthlyVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+    '</tr>';
+    sno++;
+  });
+  var monthColHeader = monthDisplayLabel ? 'Running Total ('+monthDisplayLabel+')' : 'Running Total (Month)';
+  var summaryTable=
+    '<div class="section-title">📊 SUMMARY — ALL DEPARTMENTS</div>'+
+    '<table class="summary-tbl"><thead><tr>'+
+      '<th style="text-align:right;width:32px">#</th>'+
+      '<th>Department</th>'+
+      '<th style="text-align:right">Records</th>'+
+      '<th style="text-align:right">Total Qty</th>'+
+      '<th style="text-align:right">Total Value (₨)</th>'+
+      '<th style="text-align:right">% Share</th>'+
+      '<th style="text-align:right;background:#1a4a2e;color:#a8f0c6;">'+monthColHeader+'</th>'+
+    '</tr></thead><tbody>'+summaryRows+
+      '<tr class="grand-total">'+
+        '<td></td><td>GRAND TOTAL</td>'+
+        '<td class="num">'+filtRows.length+'</td>'+
+        '<td class="num">'+grandSumQty.toLocaleString()+'</td>'+
+        '<td class="num">'+grandSumVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td class="num">100.0%</td>'+
+        '<td class="num">'+monthlyGrandVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '</tr>'+
+    '</tbody></table>';
+
+  // ── DETAIL TABLE ──
+  var tableRows='', grandQty=0, grandVal=0;
+  sortedDepts.forEach(function(dept){
+    var rows=byDept[dept].slice().sort(function(a,b){ return toISO(a.date).localeCompare(toISO(b.date)); });
+    var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
+    var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
+    grandQty+=dtQty; grandVal+=dtVal;
+    tableRows+='<tr class="group-header"><td colspan="7">🏭 '+esc(dept)+
+      ' &nbsp;|&nbsp; '+rows.length+' records &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
+    rows.forEach(function(r){
+      tableRows+='<tr>'+
+        '<td>'+esc(r.date)+'</td>'+
+        '<td>'+esc(r.itemDesc)+'</td>'+
+        '<td class="num">'+r.qty.toLocaleString()+'</td>'+
+        '<td class="num">'+r.rate.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td class="num val">'+r.value.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td>'+esc(r.unit)+'</td>'+
+        '<td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
+    });
+    tableRows+='<tr class="subtotal">'+
+      '<td colspan="2">Subtotal — '+esc(dept)+'</td>'+
+      '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
+      '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td colspan="2"></td></tr>';
+  });
+  var detailTable=
+    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY DEPARTMENT</div>'+
+    '<table><thead><tr>'+
+      '<th>Date</th><th>Description</th>'+
+      '<th style="text-align:right">Qty</th>'+
+      '<th style="text-align:right">Rate</th>'+
+      '<th style="text-align:right">Value (₨)</th>'+
+      '<th>Unit</th><th>Machine</th>'+
+    '</tr></thead><tbody>'+tableRows+
+      '<tr class="grand-total"><td colspan="2">GRAND TOTAL</td>'+
+        '<td class="num">'+grandQty.toLocaleString()+'</td><td></td>'+
+        '<td class="num">'+grandVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td colspan="2"></td></tr>'+
+    '</tbody></table>';
+
+  var extraStyles=
+    '.section-title{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
+    'color:#fff;background:#2a3a5a;padding:7px 10px;margin-bottom:0;border-radius:4px 4px 0 0;}'+
+    '.summary-tbl{margin-bottom:18px;}'+
+    '.summary-tbl thead tr{background:#1a2a48;}'+
+    '.summary-tbl tbody tr:nth-child(even){background:#f7f9fc;}'+
+    '.summary-tbl tbody tr:hover{background:#eef4ff;}';
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Department Wise Report</title>'+
+    '<style>'+printBaseStyles()+extraStyles+'</style></head><body>'+
+    reportHeader('Cost Center Wise Consumption — DEPARTMENT WISE',printedOn,'Records: '+filtRows.length+' | Depts: '+sortedDepts.length)+
+    (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
+    summaryChips([
+      [filtRows.length.toLocaleString(),'Total Records'],
+      [sortedDepts.length,'Departments'],
+      [uniq(filtRows.map(function(r){return r.date;})).length,'Dates'],
+      [totalQty.toLocaleString(),'Total Qty'],
+      ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
+    ])+
+    summaryTable+
+    detailTable+
+    '<div class="footer"><span>FANZ Spinning Mills — Department Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  openPrintWindow(html);
+}
+
+// ── ITEM WISE REPORT ─────────────────────────
+function printItemWise(){
+  var filterInfo=buildFilterInfo(), printedOn=printedOnStr();
+  var totalValue=filtRows.reduce(function(s,r){return s+r.value;},0);
+  var totalQty=filtRows.reduce(function(s,r){return s+r.qty;},0);
+
+  var byItem={};
+  filtRows.forEach(function(r){ var k=r.itemDesc||'(Unknown)'; if(!byItem[k]) byItem[k]=[]; byItem[k].push(r); });
+  // sort items by total value descending
+  var sortedItems=Object.keys(byItem).sort(function(a,b){
+    var va=byItem[a].reduce(function(s,r){return s+r.value;},0);
+    var vb=byItem[b].reduce(function(s,r){return s+r.value;},0);
+    return vb-va;
+  });
+
+  // ── SUMMARY TABLE ──
+  var grandSumQty=0, grandSumVal=0;
+  var summaryRows='';
+  var sno=1;
+  sortedItems.forEach(function(item){
+    var rows=byItem[item];
+    var iq=rows.reduce(function(s,r){return s+r.qty;},0);
+    var iv=rows.reduce(function(s,r){return s+r.value;},0);
+    var avgRate=iq?iv/iq:0;
+    grandSumQty+=iq; grandSumVal+=iv;
+    summaryRows+='<tr>'+
+      '<td class="num">'+sno+'</td>'+
+      '<td>'+esc(item)+'</td>'+
+      '<td class="num">'+rows.length+'</td>'+
+      '<td class="num">'+iq.toLocaleString()+'</td>'+
+      '<td class="num">'+avgRate.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td class="num val">'+iv.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td class="num">'+((iv/totalValue)*100).toFixed(1)+'%</td>'+
+    '</tr>';
+    sno++;
+  });
+  var summaryTable=
+    '<div class="section-title">📊 SUMMARY — ALL ITEMS</div>'+
+    '<table class="summary-tbl"><thead><tr>'+
+      '<th style="text-align:right;width:32px">#</th>'+
+      '<th>Item / Description</th>'+
+      '<th style="text-align:right">Records</th>'+
+      '<th style="text-align:right">Total Qty</th>'+
+      '<th style="text-align:right">Avg Rate</th>'+
+      '<th style="text-align:right">Total Value (₨)</th>'+
+      '<th style="text-align:right">% Share</th>'+
+    '</tr></thead><tbody>'+summaryRows+
+      '<tr class="grand-total">'+
+        '<td></td><td>GRAND TOTAL</td>'+
+        '<td class="num">'+filtRows.length+'</td>'+
+        '<td class="num">'+grandSumQty.toLocaleString()+'</td>'+
+        '<td></td>'+
+        '<td class="num">'+grandSumVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td class="num">100.0%</td>'+
+      '</tr>'+
+    '</tbody></table>';
+
+  // ── DETAIL TABLE ──
+  var tableRows='', grandQty=0, grandVal=0;
+  sortedItems.forEach(function(item){
+    var rows=byItem[item].slice().sort(function(a,b){ return toISO(a.date).localeCompare(toISO(b.date)); });
+    var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
+    var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
+    grandQty+=dtQty; grandVal+=dtVal;
+    tableRows+='<tr class="group-header"><td colspan="7">📦 '+esc(item)+
+      ' &nbsp;|&nbsp; '+rows.length+' entries &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
+    rows.forEach(function(r){
+      tableRows+='<tr>'+
+        '<td>'+esc(r.date)+'</td>'+
+        '<td>'+esc(r.dept)+'</td>'+
+        '<td class="num">'+r.qty.toLocaleString()+'</td>'+
+        '<td class="num">'+r.rate.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td class="num val">'+r.value.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td>'+esc(r.unit)+'</td>'+
+        '<td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
+    });
+    tableRows+='<tr class="subtotal">'+
+      '<td colspan="2">Subtotal — '+esc(item)+'</td>'+
+      '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
+      '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td colspan="2"></td></tr>';
+  });
+  var detailTable=
+    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY ITEM</div>'+
+    '<table><thead><tr>'+
+      '<th>Date</th><th>Department</th>'+
+      '<th style="text-align:right">Qty</th>'+
+      '<th style="text-align:right">Rate</th>'+
+      '<th style="text-align:right">Value (₨)</th>'+
+      '<th>Unit</th><th>Machine</th>'+
+    '</tr></thead><tbody>'+tableRows+
+      '<tr class="grand-total"><td colspan="2">GRAND TOTAL</td>'+
+        '<td class="num">'+grandQty.toLocaleString()+'</td><td></td>'+
+        '<td class="num">'+grandVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+        '<td colspan="2"></td></tr>'+
+    '</tbody></table>';
+
+  var extraStyles=
+    '.section-title{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
+    'color:#fff;background:#2a3a5a;padding:7px 10px;margin-bottom:0;border-radius:4px 4px 0 0;}'+
+    '.summary-tbl{margin-bottom:18px;}'+
+    '.summary-tbl thead tr{background:#1a2a48;}'+
+    '.summary-tbl tbody tr:nth-child(even){background:#f7f9fc;}'+
+    '.summary-tbl tbody tr:hover{background:#eef4ff;}';
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Item Wise Report</title>'+
+    '<style>'+printBaseStyles()+extraStyles+'</style></head><body>'+
+    reportHeader('Cost Center Wise Consumption — ITEM WISE',printedOn,'Records: '+filtRows.length+' | Items: '+sortedItems.length)+
+    (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
+    summaryChips([
+      [filtRows.length.toLocaleString(),'Total Records'],
+      [sortedItems.length,'Unique Items'],
+      [uniq(filtRows.map(function(r){return r.dept;})).length,'Departments'],
+      [totalQty.toLocaleString(),'Total Qty'],
+      ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
+    ])+
+    summaryTable+
+    detailTable+
+    '<div class="footer"><span>FANZ Spinning Mills — Item Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  openPrintWindow(html);
+}
+
+// TABLE
+function renderTable(ca){
+  var st=(page-1)*PG, pr=filtRows.slice(st,st+PG), tp=Math.max(1,Math.ceil(filtRows.length/PG));
+  var cols=[{k:'date',l:'Date'},{k:'itemDesc',l:'Description'},{k:'unit',l:'Unit'},{k:'qty',l:'Qty'},{k:'rate',l:'Rate'},{k:'value',l:'Value (₨)'},{k:'dept',l:'Department'},{k:'machine',l:'Machine'}];
+  var th=cols.map(function(c){
+    return '<th class="'+(sCol===c.k?'srt':'')+'" onclick="sortBy(\''+c.k+'\')">'+c.l+' <span style="opacity:.45;font-size:.75em">'+(sCol===c.k?(sDir===1?'▲':'▼'):'⇅')+'</span></th>';
+  }).join('');
+  var tb=pr.length?pr.map(function(r){
+    return '<tr>'+
+      '<td><span class="badge bdt">'+r.date+'</span></td>'+
+      '<td class="tdsc">'+esc(r.itemDesc)+'</td>'+
+      '<td>'+esc(r.unit)+'</td>'+
+      '<td>'+r.qty.toLocaleString()+'</td>'+
+      '<td>'+r.rate.toLocaleString()+'</td>'+
+      '<td class="vv">'+r.value.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
+      '<td><span class="badge bd">'+esc(r.dept)+'</span></td>'+
+      '<td><span class="badge bm">'+(r.machine?esc(r.machine):'—')+'</span></td>'+
+    '</tr>';
+  }).join(''):'<tr class="nor"><td colspan="8">No records match the current filters</td></tr>';
+
+  var pages=[];
+  if(tp<=7){for(var i=1;i<=tp;i++) pages.push(i);}
+  else{
+    pages.push(1);
+    if(page>3) pages.push('…');
+    for(var i=Math.max(2,page-1);i<=Math.min(tp-1,page+1);i++) pages.push(i);
+    if(page<tp-2) pages.push('…');
+    pages.push(tp);
+  }
+  var pgbtns=pages.map(function(p){
+    return p==='…'?'<span class="pgi">…</span>':
+      '<button class="pgb'+(p===page?' act':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+  }).join('');
+
+  ca.innerHTML=
+    '<div class="toolbar">'+tabsHtml()+
+      '<div class="tbr">'+
+        '<span class="rcnt">'+filtRows.length+' records</span>'+
+        '<select class="ssel" onchange="sortByV(this.value)">'+
+          '<option value="">Sort by…</option>'+
+          '<option value="date">Date</option>'+
+          '<option value="dept">Department</option>'+
+          '<option value="machine">Machine</option>'+
+          '<option value="value">Value ↓</option>'+
+          '<option value="itemDesc">Item Name</option>'+
+        '</select>'+
+        '<button class="exbtn" onclick="exportCSV()">⬇ Export CSV</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="twrap"><table><thead><tr>'+th+'</tr></thead><tbody>'+tb+'</tbody></table></div>'+
+    '<div class="pager">'+
+      '<button class="pgb" onclick="goPage('+(page-1)+')" '+(page===1?'disabled':'')+'>‹</button>'+
+      pgbtns+
+      '<button class="pgb" onclick="goPage('+(page+1)+')" '+(page===tp?'disabled':'')+'>›</button>'+
+      '<span class="pgi">&nbsp;'+(st+1)+'–'+Math.min(st+PG,filtRows.length)+' of '+filtRows.length+'</span>'+
+    '</div>';
+}
+function goPage(p){var t=Math.ceil(filtRows.length/PG);if(p<1||p>t)return;page=p;render();}
+function sortBy(c){if(sCol===c)sDir*=-1;else{sCol=c;sDir=1;}applyFilters();}
+function sortByV(v){if(v)sortBy(v);}
+
+// SUMMARY
+function renderSummary(ca){
+  ca.innerHTML='<div class="toolbar">'+tabsHtml()+'<div class="tbr"><span class="rcnt">'+filtRows.length+' records</span><button class="exbtn" onclick="exportCSV()">⬇ Export CSV</button></div></div><div class="sgrid" id="sg"></div>';
+  document.getElementById('sg').innerHTML=
+    scard('📅 By Date',groupSum('date'),'top 10')+
+    scard('🏭 By Department',groupSum('dept'),'top 10')+
+    scard('⚙️ By Machine',groupSum('machine'),'top 10')+
+    scard('📦 Top Items',groupSumItems(),'by value (excl. Packing &amp; Q/C)');
+}
+function groupSum(k){
+  var m={};
+  filtRows.forEach(function(r){var key=r[k]||'(unknown)';m[key]=(m[key]||0)+r.value;});
+  return Object.entries(m).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+}
+function groupSumItems(){
+  var m={};
+  filtRows.forEach(function(r){
+    if(r.dept&&r.dept.indexOf("PACKING")!==-1) return;
+    var key=r.itemDesc||"(unknown)";
+    m[key]=(m[key]||0)+r.value;
+  });
+  return Object.entries(m).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+}
+function scard(title,entries,sub){
+  var rows=entries.map(function(e){
+    return '<div class="srow"><span class="sk" title="'+esc(e[0])+'">'+esc(e[0])+'</span><span class="sv">₨ '+e[1].toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span></div>';
+  }).join('')||'<div style="color:var(--muted);font-size:.76rem;padding:7px 0">No data</div>';
+  return '<div class="scard"><h3>'+title+' <span>'+sub+'</span></h3>'+rows+'</div>';
+}
+
+// CHARTS
+function renderCharts(ca){
+  ca.innerHTML='<div class="toolbar">'+tabsHtml()+'</div><div class="carea" id="ca"></div>';
+  document.getElementById('ca').innerHTML=
+    bchart('Value by Date',groupSum('date'),'ca')+
+    bchart('Value by Department',groupSum('dept'),'cb')+
+    bchart('Value by Machine No.',groupSum('machine'),'cg');
+}
+function bchart(title,entries,cls){
+  if(!entries.length) return '';
+  var max=entries[0][1];
+  var bars=entries.map(function(e){
+    var pct=max?(e[1]/max*100).toFixed(1):0;
+    var lbl=e[1]>=1000?(e[1]/1000).toFixed(1)+'K':e[1].toFixed(0);
+    return '<div class="brow"><div class="blbl" title="'+esc(e[0])+'">'+esc(e[0])+'</div><div class="btrk"><div class="bfil '+cls+'" style="width:'+pct+'%"><span>'+lbl+'</span></div></div></div>';
+  }).join('');
+  return '<div class="ccard"><h3>'+title+'</h3><div class="bchart">'+bars+'</div></div>';
+}
+
+// EXPORT
+function exportCSV(){
+  var h='Date,Description,Unit,Qty,Rate,Value,Department,Machine\n';
+  var b=filtRows.map(function(r){
+    return ['date','itemDesc','unit','qty','rate','value','dept','machine'].map(function(k){return '"'+String(r[k]).replace(/"/g,'""')+'"';}).join(',');
+  }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([h+b],{type:'text/csv'}));
+  a.download='consumption_export.csv';a.click();
+}
+</script>
+</body>
+</html>
