@@ -20,8 +20,8 @@
 
   /* ── HEADER ── */
   header{
-    padding:18px 26px;display:flex;align-items:center;justify-content:space-between;
-    gap:14px;flex-wrap:wrap;
+    padding:18px 26px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    gap:14px;
     background:linear-gradient(135deg,#0d1020 0%,#141828 50%,#0f1320 100%);
     border-bottom:1px solid var(--border);
     box-shadow:0 2px 24px rgba(16,217,160,.07);
@@ -40,6 +40,9 @@
     pointer-events:none;
   }
   .logo h1{font-size:1.4rem;font-weight:800;letter-spacing:-.3px;}
+  .logo{justify-self:center;text-align:center;}
+  .menu-toggle{justify-self:start;}
+  .hstats{justify-self:end;}
   .logo h1 span{
     background:linear-gradient(90deg,#10d9a0,#a855f7);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -156,13 +159,13 @@
   .sw input{padding-left:26px;}
 
   /* DATE RANGE */
-  .dr-wrap{display:flex;flex-direction:column;gap:5px;}
-  .dr-row{display:flex;align-items:center;gap:6px;}
-  .dr-row span{font-size:.65rem;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+  .dr-wrap{display:flex;flex-direction:column;gap:10px;}
+  .dr-row{display:flex;flex-direction:column;align-items:stretch;gap:4px;}
+  .dr-row span{font-size:.65rem;color:var(--muted);white-space:nowrap;}
   input[type=date]{
-    width:100%;background:var(--surface2);border:1px solid var(--border);
-    color:var(--text);border-radius:6px;padding:7px 9px;
-    font-family:'DM Mono',monospace;font-size:.74rem;appearance:none;outline:none;transition:all .18s;color-scheme:dark;
+    width:100%;box-sizing:border-box;height:38px;background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;padding:0 10px;
+    font-family:'DM Mono',monospace;font-size:.8rem;appearance:none;outline:none;transition:all .18s;color-scheme:dark;
   }
   input[type=date]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow-teal);}
   .dr-presets{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;}
@@ -174,15 +177,30 @@
 
   /* ── TOOLBAR ── */
   .content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .content-body{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
   .toolbar{
     padding:11px 18px;border-bottom:1px solid var(--border);
-    display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+    display:flex;flex-direction:column;gap:9px;
     background:linear-gradient(90deg,#13192a,#161c2e);flex-shrink:0;
   }
+  .toolbar-row1{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .tb-tabs{display:flex;align-items:center;gap:7px;flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tb-tabs::-webkit-scrollbar{height:0;}
+  .toolbar-row2{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+  .tb-search{position:relative;flex:1;min-width:180px;max-width:320px;}
+  .tb-search::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1rem;pointer-events:none;}
+  .tb-search input{
+    width:100%;padding:7px 10px 7px 28px;background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;font-family:'DM Mono',monospace;font-size:.76rem;outline:none;transition:all .18s;
+  }
+  .tb-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow-teal);}
+  .tb-search input::placeholder{color:var(--muted);}
   .tbbtn{
     padding:6px 12px;border-radius:6px;border:1px solid transparent;
     font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;
     cursor:pointer;transition:all .18s;background:transparent;color:var(--muted);
+    flex-shrink:0;white-space:nowrap;
   }
   .tbbtn.act{
     background:linear-gradient(135deg,#059c72,#10d9a0);color:#0a1a14;
@@ -210,6 +228,8 @@
     color:var(--text);border-radius:6px;font-size:.73rem;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all .18s;
   }
   .exbtn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(168,85,247,.08);}
+  .bexport{background:var(--surface2);color:var(--text);border:1px solid var(--border);width:100%;margin-top:4px;}
+  .bexport:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(168,85,247,.08);}
 
   /* ── TABLE ── */
   .twrap{flex:1;overflow:auto;padding:12px 18px;background:var(--bg);}
@@ -291,8 +311,8 @@
   .brow{display:flex;align-items:center;gap:10px;}
   .blbl{width:140px;min-width:80px;font-size:.7rem;color:var(--text);font-family:'DM Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .btrk{flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:18px;overflow:hidden;}
-  .bfil{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;padding-right:6px;justify-content:flex-end;min-width:2px;}
-  .bfil span{font-size:.65rem;font-family:'DM Mono',monospace;color:rgba(0,0,0,.75);font-weight:700;}
+  .bfil{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);min-width:2px;}
+  .bval{min-width:52px;flex-shrink:0;text-align:right;font-size:.7rem;font-family:'DM Mono',monospace;font-weight:700;color:var(--text);}
   .ca{background:linear-gradient(90deg,#059c72,#10d9a0);}
   .cb{background:linear-gradient(90deg,#7c3aed,#a855f7);}
   .cg{background:linear-gradient(90deg,#d97706,#fbbf24);}
@@ -303,7 +323,77 @@
   .empty h2{font-size:1.1rem;color:var(--text);}
   .empty p{font-size:.8rem;max-width:290px;line-height:1.6;}
 
-  @media(max-width:680px){.main{flex-direction:column;height:auto;}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}.sb{max-height:360px;}}
+  /* ── MENU TOGGLE (hamburger) ── */
+  .menu-toggle{
+    display:none;flex-direction:column;justify-content:center;align-items:center;gap:4px;
+    width:38px;height:38px;min-width:38px;border-radius:8px;border:1px solid var(--border);
+    background:var(--surface2);cursor:pointer;flex-shrink:0;z-index:2;
+  }
+  .menu-toggle:hover{border-color:var(--accent);}
+  .menu-toggle .mt-bar{width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .2s;}
+  .menu-toggle.open .mt-bar:nth-child(1){transform:translateY(6px) rotate(45deg);}
+  .menu-toggle.open .mt-bar:nth-child(2){opacity:0;}
+  .menu-toggle.open .mt-bar:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+  /* ── SIDEBAR MOBILE HEAD / OVERLAY ── */
+  .sb-mobile-head{display:none;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .sb-mobile-head span{font-size:.9rem;font-weight:800;color:var(--text);}
+  .sb-close{
+    background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+    border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:.85rem;
+  }
+  .sb-close:hover{border-color:var(--danger);color:var(--danger);}
+  .sidebar-overlay{
+    display:none;position:fixed;inset:0;background:rgba(5,7,14,.65);backdrop-filter:blur(2px);
+    z-index:997;opacity:0;transition:opacity .2s;
+  }
+  .sidebar-overlay.show{display:block;opacity:1;}
+
+  /* ── RESPONSIVE: TABLET / MOBILE ── */
+  @media(max-width:768px){
+    header{padding:12px 14px;gap:10px;}
+    .menu-toggle{display:flex;}
+    .logo h1{font-size:1.15rem;}
+    .logo p{font-size:.62rem;}
+    .hstats{gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;max-width:100%;padding-bottom:2px;}
+    .hstats::-webkit-scrollbar{height:0;}
+    .chip{padding:5px 10px;flex-shrink:0;}
+
+    .main{height:calc(100vh - 66px);}
+    .sidebar{
+      position:fixed;top:0;left:0;bottom:0;z-index:998;
+      width:82%;max-width:320px;min-width:0;
+      transform:translateX(-100%);transition:transform .25s cubic-bezier(.22,1,.36,1);
+      box-shadow:4px 0 30px rgba(0,0,0,.4);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .sb-mobile-head{display:flex;}
+
+    .content{width:100%;}
+    .toolbar{padding:9px 12px;}
+    .toolbar-row2{width:100%;}
+    .tb-search{max-width:none;}
+    .tbr{width:100%;margin-left:0;justify-content:space-between;}
+    .twrap,.carea,.sgrid{padding:10px 12px;}
+    table{font-size:.72rem;}
+    th,td{padding:8px 8px;}
+    .sgrid{grid-template-columns:1fr;gap:10px;}
+    .blbl{width:96px;min-width:70px;font-size:.65rem;}
+    .bval{min-width:42px;font-size:.65rem;}
+    .print-modal{padding:22px 18px 18px;}
+  }
+
+  @media(max-width:420px){
+    .logo p{display:none;}
+    .chip .v{font-size:.85rem;}
+    .chip .l{font-size:.58rem;}
+    .lbtns{flex-direction:column;}
+  }
+
+  @media(max-width:480px){
+    .tb-tabs{gap:4px;}
+    .tbbtn{padding:6px 8px;font-size:.68rem;}
+  }
 
   /* ── PRINT MODAL ── */
   .print-modal-overlay{
@@ -346,11 +436,40 @@
     cursor:pointer;transition:all .18s;
   }
   .print-modal-cancel:hover{border-color:var(--danger);color:var(--danger);background:rgba(244,63,94,.06);}
+
+  /* ── PRINT REPORT OVERLAY (renders the report in-page; the only export
+       path is a file download, since window.open()/window.print() are
+       frequently blocked inside embedded app webviews/preview panes) ── */
+  #printReportOverlay{
+    display:none;position:fixed;inset:0;background:#ffffff;z-index:10000;overflow-y:auto;
+  }
+  #printReportOverlay.show{display:block;}
+  .pr-toolbar{
+    position:sticky;top:0;background:#f2f2f2;border-bottom:1px solid #ccc;
+    padding:10px 16px;display:flex;align-items:center;justify-content:flex-end;gap:8px;z-index:2;flex-wrap:wrap;
+  }
+  .pr-toolbar button{
+    padding:7px 16px;border-radius:6px;border:1px solid #bbb;background:#fff;color:#111;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .15s;
+  }
+  .pr-toolbar button:hover{border-color:#888;}
+  .pr-toolbar .pr-print-btn{background:#111;color:#fff;border-color:#111;}
+  .pr-toolbar .pr-print-btn:hover{background:#333;}
+  #printReportBody{padding:16px 24px 40px;color:#111;background:#fff;}
+
+  @media print{
+    body.printing-report>*:not(#printReportOverlay){display:none!important;}
+    body.printing-report #printReportOverlay{position:static!important;inset:auto!important;overflow:visible!important;}
+    .no-print{display:none!important;}
+  }
 </style>
 </head>
 <body>
 
 <header>
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+    <span class="mt-bar"></span><span class="mt-bar"></span><span class="mt-bar"></span>
+  </button>
   <div class="logo">
     <h1>FANZ <span>Spinning Mills</span></h1>
     <p>Cost Center Wise Consumption Dashboard</p>
@@ -358,9 +477,15 @@
   <div class="hstats" id="hstats"></div>
 </header>
 
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="main">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sb">
+      <div class="sb-mobile-head">
+        <span>Menu</span>
+        <button class="sb-close" id="sidebarClose" aria-label="Close menu">✕</button>
+      </div>
       <div class="slbl">Load Data</div>
 
       <!-- GOOGLE DRIVE AUTO-FETCH -->
@@ -391,7 +516,6 @@
 
       <div id="filecount"></div>
       <div class="slbl">Filters</div>
-      <div class="fb"><label>Search Item</label><div class="sw"><input type="text" id="fSearch" placeholder="Name or code…"></div></div>
       <div class="fb">
         <label>Date Range</label>
         <div class="dr-wrap">
@@ -400,7 +524,7 @@
             <input type="date" id="fDateFrom" title="Start date">
           </div>
           <div class="dr-row">
-            <span>To&nbsp;&nbsp;&nbsp;</span>
+            <span>To</span>
             <input type="date" id="fDateTo" title="End date">
           </div>
           <div class="dr-presets">
@@ -414,16 +538,30 @@
       <div class="fb"><label>Department</label><select id="fDept"><option value="">All Departments</option></select></div>
       <div class="fb"><label>Machine No.</label><select id="fMach"><option value="">All Machines</option></select></div>
       <button class="btn bclear" onclick="clearF()">↺ Clear Filters</button>
+
+      <div class="slbl">Export</div>
+      <button class="btn bexport" onclick="exportCSV()">⬇ Export CSV</button>
     </div>
   </aside>
 
   <div class="content" id="content">
-    <div class="empty">
-      <div class="ei">📊</div>
-      <h2>No Data Loaded</h2>
-      <p>Click <strong>Open Folder</strong> to load your entire reports folder at once, or <strong>Pick Files</strong> to choose individual files.</p>
+    <div class="content-body" id="contentBody">
+      <div class="empty">
+        <div class="ei">📊</div>
+        <h2>No Data Loaded</h2>
+        <p>Click <strong>Open Folder</strong> to load your entire reports folder at once, or <strong>Pick Files</strong> to choose individual files.</p>
+      </div>
     </div>
   </div>
+
+</div>
+
+<div id="printReportOverlay">
+  <div class="pr-toolbar no-print">
+    <button class="pr-print-btn" onclick="downloadCurrentReport()">⬇ Download Report</button>
+    <button onclick="closePrintReport()">✕ Close</button>
+  </div>
+  <div id="printReportBody"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -431,6 +569,46 @@
 var allRows=[], filtRows=[], loadedMap={};
 var sCol='date', sDir=1, tab='table', page=1;
 var PG=50;
+
+// ── DEVICE DETECTION (mobile vs desktop layout) ──────
+var mqMobile = window.matchMedia('(max-width:768px)');
+
+// ── MOBILE SIDEBAR DRAWER ────────────────────────────
+var sidebarEl = document.getElementById('sidebar');
+var overlayEl = document.getElementById('sidebarOverlay');
+var menuToggleEl = document.getElementById('menuToggle');
+var sidebarCloseEl = document.getElementById('sidebarClose');
+
+function openSidebar(){
+  sidebarEl.classList.add('open');
+  overlayEl.classList.add('show');
+  menuToggleEl.classList.add('open');
+  menuToggleEl.setAttribute('aria-expanded','true');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  sidebarEl.classList.remove('open');
+  overlayEl.classList.remove('show');
+  menuToggleEl.classList.remove('open');
+  menuToggleEl.setAttribute('aria-expanded','false');
+  document.body.style.overflow='';
+}
+function toggleSidebar(){
+  sidebarEl.classList.contains('open') ? closeSidebar() : openSidebar();
+}
+menuToggleEl.addEventListener('click', toggleSidebar);
+sidebarCloseEl.addEventListener('click', closeSidebar);
+overlayEl.addEventListener('click', closeSidebar);
+
+function applyDeviceClass(){
+  var isMobile = mqMobile.matches;
+  document.body.classList.toggle('is-mobile', isMobile);
+  document.body.classList.toggle('is-desktop', !isMobile);
+  if(!isMobile) closeSidebar(); // ensure drawer state doesn't linger when switching to desktop
+}
+applyDeviceClass();
+if(mqMobile.addEventListener) mqMobile.addEventListener('change', applyDeviceClass);
+else if(mqMobile.addListener) mqMobile.addListener(applyDeviceClass); // Safari fallback
 
 // ── BUTTON CLICKS ─────────────────────────────
 document.getElementById('btn_folder').onclick = function(){
@@ -484,7 +662,10 @@ function processFiles(files){
       if(err){ alert('Error in '+f.name+': '+err); }
       else { allRows=allRows.concat(rows); loadedMap[f.name]=rows.length; }
       done++;
-      if(done===todo.length){ renderFileList(); rebuildFilters(); applyFilters(); }
+      if(done===todo.length){
+        renderFileList(); rebuildFilters(); applyFilters();
+        if(document.body.classList.contains('is-mobile')) closeSidebar();
+      }
     });
   });
 }
@@ -846,8 +1027,11 @@ function fillSel(id,vals){
   if(vals.indexOf(cur)!==-1) s.value=cur;
 }
 
+var searchQ='';
 function applyFilters(){
-  var q=document.getElementById('fSearch').value.toLowerCase().trim();
+  var searchEl=document.getElementById('fSearch');
+  if(searchEl) searchQ=searchEl.value;
+  var q=searchQ.toLowerCase().trim();
   var fr=document.getElementById('fDateFrom').value; // YYYY-MM-DD or ''
   var ft=document.getElementById('fDateTo').value;
   var fp=document.getElementById('fDept').value;
@@ -875,16 +1059,16 @@ function applyFilters(){
   page=1; renderStats(); render();
 }
 function clearF(){
-  ['fSearch','fDept','fMach'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el.tagName==='SELECT') el.value=''; else el.value='';
+  searchQ='';
+  ['fDept','fMach'].forEach(function(id){
+    document.getElementById(id).value='';
   });
   document.getElementById('fDateFrom').value='';
   document.getElementById('fDateTo').value='';
   document.querySelectorAll('.drp').forEach(function(b){b.classList.remove('on');});
   applyFilters();
 }
-['fSearch','fDept','fMach'].forEach(function(id){
+['fDept','fMach'].forEach(function(id){
   document.getElementById(id).addEventListener('input',applyFilters);
   document.getElementById(id).addEventListener('change',applyFilters);
 });
@@ -895,7 +1079,6 @@ document.getElementById('fDateTo').addEventListener('change',applyFilters);
 function renderStats(){
   var tot=filtRows.reduce(function(s,r){return s+r.value;},0);
   document.getElementById('hstats').innerHTML=
-    chip(filtRows.length.toLocaleString(),'Records')+
     chip(uniq(filtRows.map(function(r){return r.date;})).length,'Dates')+
     chip(uniq(filtRows.map(function(r){return r.dept;})).length,'Depts')+
     chip('₨'+(tot/1000).toFixed(1)+'K','Total Value');
@@ -904,24 +1087,58 @@ function chip(v,l){return '<div class="chip"><div class="v">'+v+'</div><div clas
 
 // ── RENDER ────────────────────────────────────
 function render(){
-  var ca=document.getElementById('content');
+  var ca=document.getElementById('contentBody');
   if(!allRows.length){
     ca.innerHTML='<div class="empty"><div class="ei">📊</div><h2>No Data Loaded</h2><p>Click <strong>Open Folder</strong> to load your entire reports folder, or <strong>Pick Files</strong> to select specific files.</p></div>';
     return;
   }
+  // Remember which field (if any) was focused, so typing in the toolbar
+  // search box isn't interrupted when its markup gets rebuilt below.
+  var af=document.activeElement;
+  var afId=(af&&af.id)?af.id:null;
+  var afSel=(afId&&typeof af.selectionStart==='number')?[af.selectionStart,af.selectionEnd]:null;
+
   if(tab==='table') renderTable(ca);
   else if(tab==='summary') renderSummary(ca);
   else renderCharts(ca);
+
+  if(afId){
+    var el=document.getElementById(afId);
+    if(el){
+      el.focus();
+      if(afSel&&typeof el.setSelectionRange==='function'){
+        try{ el.setSelectionRange(afSel[0],afSel[1]); }catch(e){}
+      }
+    }
+  }
 }
 
 function tabsHtml(){
+  var narrow=window.innerWidth<=480;
   var tabs=['table','summary','charts'];
   var lbl={table:'📋 Table',summary:'🗂 Summary',charts:'📊 Charts'};
+  var printLbl=narrow?'🖨️ PDF':'🖨️ Print / PDF';
   return tabs.map(function(t){
     return '<button class="tbbtn'+(tab===t?' act':'')+'" onclick="switchTab(\''+t+'\')">'+lbl[t]+'</button>';
-  }).join('')+'<button class="tbbtn tbbtn-print" onclick="printReport()">🖨️ Print / PDF</button>';
+  }).join('')+'<button class="tbbtn tbbtn-print" onclick="printReport()">'+printLbl+'</button>';
 }
 function switchTab(t){tab=t;page=1;render();}
+
+// Row 2 of the toolbar: search bar (all views) + sort filter (table view only)
+function toolbarRow2(showSort){
+  var search='<div class="tb-search"><input type="text" id="fSearch" placeholder="Search item name or code…" value="'+esc(searchQ)+'" oninput="applyFilters()"></div>';
+  var sort=showSort?(
+    '<select class="ssel" onchange="sortByV(this.value)">'+
+      '<option value="">Sort by…</option>'+
+      '<option value="date">Date</option>'+
+      '<option value="dept">Department</option>'+
+      '<option value="machine">Machine</option>'+
+      '<option value="value">Value ↓</option>'+
+      '<option value="itemDesc">Item Name</option>'+
+    '</select>'
+  ):'';
+  return '<div class="toolbar-row2">'+search+sort+'</div>';
+}
 
 // ── PRINT REPORT MODAL ────────────────────────
 function printReport(){
@@ -965,6 +1182,16 @@ function closePrintModal(){
   if(el) el.remove();
 }
 
+// Expand/collapse a group's detail rows in Date/Department/Item Wise reports
+function toggleRptGroup(gid){
+  var rows=document.querySelectorAll('tr[data-grp="'+gid+'"]');
+  var arrow=document.getElementById(gid+'-arrow');
+  if(!rows.length) return;
+  var isHidden=rows[0].style.display==='none';
+  rows.forEach(function(r){ r.style.display=isHidden?'table-row':'none'; });
+  if(arrow) arrow.textContent=isHidden?'▼':'▶';
+}
+
 // ── SHARED PRINT HELPERS ──────────────────────
 function buildFilterInfo(){
   var filterInfo=[];
@@ -996,26 +1223,82 @@ function printBaseStyles(){
     '.schip{border:1px solid #ddd;border-radius:4px;padding:5px 12px;text-align:center;min-width:100px;}'+
     '.schip .sv{font-size:11pt;font-weight:bold;color:#000;}'+
     '.schip .sl{font-size:7.5pt;color:#666;margin-top:1px;}'+
-    'table{width:100%;border-collapse:collapse;font-size:8.5pt;}'+
+    'table{width:100%;border-collapse:collapse;font-size:8.5pt;color:#111;}'+
     'thead tr{background:#222;color:#fff;}'+
     'th{padding:6px 8px;text-align:left;font-weight:bold;font-size:7.5pt;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}'+
     'tbody tr{border-bottom:1px solid #e8e8e8;}'+
-    'td{padding:5px 8px;vertical-align:middle;}'+
+    'tbody tr td{color:#111;}'+
+    'td{padding:5px 8px;vertical-align:middle;color:#111;}'+
     'td.num{text-align:right;font-family:monospace;}'+
     'td.val{font-weight:bold;color:#b87800;}'+
     '.group-header td{background:#2a3a5a;color:#fff;font-weight:bold;font-size:8.5pt;padding:7px 8px;border-top:2px solid #aaa;}'+
+    '.group-header{cursor:pointer;}'+
+    '.group-header:hover td{background:#354a75;}'+
+    '.grp-toggle{display:inline-block;width:14px;font-size:8pt;}'+
     '.subtotal td{background:#eef2f7;font-weight:bold;font-size:8pt;border-top:1px solid #bbb;}'+
     '.subtotal td.num{text-align:right;font-family:monospace;}'+
     '.grand-total td{background:#222;color:#fff;font-weight:bold;font-size:9pt;padding:7px 8px;border-top:3px solid #000;}'+
     '.grand-total td.num{text-align:right;font-family:monospace;}'+
     '.footer{margin-top:14px;border-top:1px solid #ccc;padding-top:6px;font-size:7.5pt;color:#888;display:flex;justify-content:space-between;}'+
-    '@media print{.no-print{display:none!important;} body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
+    '@media print{.no-print{display:none!important;} .rpt-detail-row{display:table-row!important;} .grp-toggle{display:none!important;} body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
 }
 
-function openPrintWindow(html){
-  var w=window.open('','_blank','width=1100,height=750');
-  if(!w){ alert('Pop-up blocked! Please allow pop-ups for this page and try again.'); return; }
-  w.document.open(); w.document.write(html); w.document.close();
+var lastReportFullHtml='', lastReportFilename='report.html';
+
+function showPrintReport(bodyHtml, extraStyles, title, filename){
+  var styleEl=document.getElementById('printReportStyle');
+  if(!styleEl){
+    styleEl=document.createElement('style');
+    styleEl.id='printReportStyle';
+    document.head.appendChild(styleEl);
+  }
+  var styles=printBaseStyles()+(extraStyles||'');
+  styleEl.textContent=styles;
+  document.getElementById('printReportBody').innerHTML=bodyHtml;
+  document.body.classList.add('printing-report');
+  document.getElementById('printReportOverlay').classList.add('show');
+  window.scrollTo(0,0);
+
+  // Build a fully standalone copy of this report (its own <html> document
+  // with the print stylesheet baked in) so it can be downloaded and opened
+  // independently. This is the only path we rely on: window.print()/window.open()
+  // are frequently blocked inside embedded app webviews/preview panes, but a
+  // Blob download works reliably — the downloaded file auto-prints itself
+  // (via its own onload script) the moment it's opened in a real browser.
+  // The downloaded copy has no interactive JS to expand groups, so force every
+  // collapsible detail row and the summary title's collapse arrows to their
+  // fully-expanded state — this file is the final record, it should show
+  // everything, not just the headings.
+  var exportStyles=styles+
+    '.rpt-detail-row{display:table-row!important;}'+
+    '.grp-toggle{display:none!important;}'+
+    '.group-header{cursor:default!important;}';
+  lastReportFullHtml='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(title||'FANZ Report')+
+    '</title><style>'+exportStyles+'</style></head><body>'+bodyHtml+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  lastReportFilename=filename||'report.html';
+}
+function downloadCurrentReport(){
+  if(!lastReportFullHtml) return;
+  try{
+    var a=document.createElement('a');
+    var url=URL.createObjectURL(new Blob([lastReportFullHtml],{type:'text/html'}));
+    a.href=url;
+    a.download=lastReportFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+  }catch(e){
+    alert('Download was blocked by this browser/preview (error: '+e.message+'). '+
+      'Please open this dashboard file directly in your phone/desktop browser (not inside an app preview) and try again.');
+  }
+}
+function closePrintReport(){
+  document.getElementById('printReportOverlay').classList.remove('show');
+  document.body.classList.remove('printing-report');
+  var styleEl=document.getElementById('printReportStyle');
+  if(styleEl) styleEl.textContent='';
 }
 
 function reportHeader(subtitle, printedOn, extra){
@@ -1048,32 +1331,33 @@ function printDateWise(){
   filtRows.forEach(function(r){ if(!byDate[r.date]) byDate[r.date]=[]; byDate[r.date].push(r); });
   var sortedDates=Object.keys(byDate).sort(function(a,b){ return toISO(a).localeCompare(toISO(b)); });
 
-  var tableRows='', grandQty=0, grandVal=0;
+  var tableRows='', grandQty=0, grandVal=0, gIdx=0;
   sortedDates.forEach(function(date){
     var rows=byDate[date];
     var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
     var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
     grandQty+=dtQty; grandVal+=dtVal;
-    tableRows+='<tr class="group-header"><td colspan="7">📅 '+date+
+    var gid='dateGrp'+gIdx; gIdx++;
+    tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
+      '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>📅 '+date+
       ' &nbsp;|&nbsp; '+rows.length+' items &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
-      tableRows+='<tr>'+
+      tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
         '<td>'+esc(r.itemDesc)+'</td><td>'+esc(r.unit)+'</td>'+
         '<td class="num">'+r.qty.toLocaleString()+'</td>'+
         '<td class="num">'+r.rate.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
         '<td class="num val">'+r.value.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
         '<td>'+esc(r.dept)+'</td><td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
     });
-    tableRows+='<tr class="subtotal">'+
+    tableRows+='<tr class="subtotal rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
       '<td colspan="2">Subtotal — '+date+'</td>'+
       '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
       '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
       '<td colspan="2"></td></tr>';
   });
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Date Wise Report</title>'+
-    '<style>'+printBaseStyles()+'</style></head><body>'+
+  var bodyHtml=
     reportHeader('Cost Center Wise Consumption — DATE WISE',printedOn,'Records: '+filtRows.length+' | Dates: '+sortedDates.length)+
     (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
     summaryChips([
@@ -1083,6 +1367,7 @@ function printDateWise(){
       [totalQty.toLocaleString(),'Total Qty'],
       ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
     ])+
+    '<div class="section-title">📋 CONSUMPTION DETAIL <span style="font-weight:normal;text-transform:none;font-size:7.5pt;opacity:.8;">(click a date to expand/collapse)</span></div>'+
     '<table><thead><tr>'+
       '<th>Description</th><th>Unit</th>'+
       '<th style="text-align:right">Qty</th>'+
@@ -1095,9 +1380,11 @@ function printDateWise(){
         '<td class="num">'+grandVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
         '<td colspan="2"></td></tr>'+
     '</tbody></table>'+
-    '<div class="footer"><span>FANZ Spinning Mills — Date Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
-    '<script>window.onload=function(){window.print();}<\/script></body></html>';
-  openPrintWindow(html);
+    '<div class="footer"><span>FANZ Spinning Mills — Date Wise Consumption Report</span><span>'+printedOn+'</span></div>';
+  var dateWiseExtraStyles=
+    '.section-title{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
+    'color:#fff;background:#2a3a5a;padding:7px 10px;margin-bottom:0;border-radius:4px 4px 0 0;}';
+  showPrintReport(bodyHtml, dateWiseExtraStyles, 'FANZ — Date Wise Report', 'FANZ_DateWise_Report.html');
 }
 
 // ── DEPARTMENT WISE REPORT ───────────────────
@@ -1179,8 +1466,9 @@ function printDeptWise(){
   });
   var monthColHeader = monthDisplayLabel ? 'Running Total ('+monthDisplayLabel+')' : 'Running Total (Month)';
   var summaryTable=
-    '<div class="section-title">📊 SUMMARY — ALL DEPARTMENTS</div>'+
-    '<table class="summary-tbl"><thead><tr>'+
+    '<table class="summary-tbl"><thead>'+
+      '<tr><th colspan="7" class="section-title-row">📊 SUMMARY — ALL DEPARTMENTS</th></tr>'+
+      '<tr>'+
       '<th style="text-align:right;width:32px">#</th>'+
       '<th>Department</th>'+
       '<th style="text-align:right">Records</th>'+
@@ -1199,18 +1487,20 @@ function printDeptWise(){
       '</tr>'+
     '</tbody></table>';
 
-  // ── DETAIL TABLE ──
-  var tableRows='', grandQty=0, grandVal=0;
+  // ── DETAIL TABLE (collapsible per department) ──
+  var tableRows='', grandQty=0, grandVal=0, gIdx=0;
   sortedDepts.forEach(function(dept){
     var rows=byDept[dept].slice().sort(function(a,b){ return toISO(a.date).localeCompare(toISO(b.date)); });
     var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
     var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
     grandQty+=dtQty; grandVal+=dtVal;
-    tableRows+='<tr class="group-header"><td colspan="7">🏭 '+esc(dept)+
+    var gid='deptGrp'+gIdx; gIdx++;
+    tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
+      '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>🏭 '+esc(dept)+
       ' &nbsp;|&nbsp; '+rows.length+' records &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
-      tableRows+='<tr>'+
+      tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
         '<td>'+esc(r.date)+'</td>'+
         '<td>'+esc(r.itemDesc)+'</td>'+
         '<td class="num">'+r.qty.toLocaleString()+'</td>'+
@@ -1219,14 +1509,14 @@ function printDeptWise(){
         '<td>'+esc(r.unit)+'</td>'+
         '<td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
     });
-    tableRows+='<tr class="subtotal">'+
+    tableRows+='<tr class="subtotal rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
       '<td colspan="2">Subtotal — '+esc(dept)+'</td>'+
       '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
       '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
       '<td colspan="2"></td></tr>';
   });
   var detailTable=
-    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY DEPARTMENT</div>'+
+    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY DEPARTMENT <span style="font-weight:normal;text-transform:none;font-size:7.5pt;opacity:.8;">(click a department to expand/collapse)</span></div>'+
     '<table><thead><tr>'+
       '<th>Date</th><th>Description</th>'+
       '<th style="text-align:right">Qty</th>'+
@@ -1243,13 +1533,14 @@ function printDeptWise(){
   var extraStyles=
     '.section-title{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
     'color:#fff;background:#2a3a5a;padding:7px 10px;margin-bottom:0;border-radius:4px 4px 0 0;}'+
+    '.section-title-row{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
+    'color:#fff;background:#2a3a5a;padding:7px 10px;text-align:left;}'+
     '.summary-tbl{margin-bottom:18px;}'+
     '.summary-tbl thead tr{background:#1a2a48;}'+
     '.summary-tbl tbody tr:nth-child(even){background:#f7f9fc;}'+
     '.summary-tbl tbody tr:hover{background:#eef4ff;}';
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Department Wise Report</title>'+
-    '<style>'+printBaseStyles()+extraStyles+'</style></head><body>'+
+  var bodyHtml=
     reportHeader('Cost Center Wise Consumption — DEPARTMENT WISE',printedOn,'Records: '+filtRows.length+' | Depts: '+sortedDepts.length)+
     (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
     summaryChips([
@@ -1260,10 +1551,8 @@ function printDeptWise(){
       ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
     ])+
     summaryTable+
-    detailTable+
-    '<div class="footer"><span>FANZ Spinning Mills — Department Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
-    '<script>window.onload=function(){window.print();}<\/script></body></html>';
-  openPrintWindow(html);
+    detailTable;
+  showPrintReport(bodyHtml, extraStyles, 'FANZ — Department Wise Report', 'FANZ_DepartmentWise_Report.html');
 }
 
 // ── ITEM WISE REPORT ─────────────────────────
@@ -1303,8 +1592,9 @@ function printItemWise(){
     sno++;
   });
   var summaryTable=
-    '<div class="section-title">📊 SUMMARY — ALL ITEMS</div>'+
-    '<table class="summary-tbl"><thead><tr>'+
+    '<table class="summary-tbl"><thead>'+
+      '<tr><th colspan="7" class="section-title-row">📊 SUMMARY — ALL ITEMS</th></tr>'+
+      '<tr>'+
       '<th style="text-align:right;width:32px">#</th>'+
       '<th>Item / Description</th>'+
       '<th style="text-align:right">Records</th>'+
@@ -1323,18 +1613,20 @@ function printItemWise(){
       '</tr>'+
     '</tbody></table>';
 
-  // ── DETAIL TABLE ──
-  var tableRows='', grandQty=0, grandVal=0;
+  // ── DETAIL TABLE (collapsible per item) ──
+  var tableRows='', grandQty=0, grandVal=0, gIdx=0;
   sortedItems.forEach(function(item){
     var rows=byItem[item].slice().sort(function(a,b){ return toISO(a.date).localeCompare(toISO(b.date)); });
     var dtQty=rows.reduce(function(s,r){return s+r.qty;},0);
     var dtVal=rows.reduce(function(s,r){return s+r.value;},0);
     grandQty+=dtQty; grandVal+=dtVal;
-    tableRows+='<tr class="group-header"><td colspan="7">📦 '+esc(item)+
+    var gid='itemGrp'+gIdx; gIdx++;
+    tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
+      '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>📦 '+esc(item)+
       ' &nbsp;|&nbsp; '+rows.length+' entries &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
-      tableRows+='<tr>'+
+      tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
         '<td>'+esc(r.date)+'</td>'+
         '<td>'+esc(r.dept)+'</td>'+
         '<td class="num">'+r.qty.toLocaleString()+'</td>'+
@@ -1343,14 +1635,14 @@ function printItemWise(){
         '<td>'+esc(r.unit)+'</td>'+
         '<td>'+(r.machine?esc(r.machine):'—')+'</td></tr>';
     });
-    tableRows+='<tr class="subtotal">'+
+    tableRows+='<tr class="subtotal rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
       '<td colspan="2">Subtotal — '+esc(item)+'</td>'+
       '<td class="num">'+dtQty.toLocaleString()+'</td><td></td>'+
       '<td class="num">'+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'+
       '<td colspan="2"></td></tr>';
   });
   var detailTable=
-    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY ITEM</div>'+
+    '<div class="section-title" style="margin-top:18px">📋 DETAIL — BY ITEM <span style="font-weight:normal;text-transform:none;font-size:7.5pt;opacity:.8;">(click an item to expand/collapse)</span></div>'+
     '<table><thead><tr>'+
       '<th>Date</th><th>Department</th>'+
       '<th style="text-align:right">Qty</th>'+
@@ -1367,13 +1659,14 @@ function printItemWise(){
   var extraStyles=
     '.section-title{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
     'color:#fff;background:#2a3a5a;padding:7px 10px;margin-bottom:0;border-radius:4px 4px 0 0;}'+
+    '.section-title-row{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;'+
+    'color:#fff;background:#2a3a5a;padding:7px 10px;text-align:left;}'+
     '.summary-tbl{margin-bottom:18px;}'+
     '.summary-tbl thead tr{background:#1a2a48;}'+
     '.summary-tbl tbody tr:nth-child(even){background:#f7f9fc;}'+
     '.summary-tbl tbody tr:hover{background:#eef4ff;}';
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FANZ — Item Wise Report</title>'+
-    '<style>'+printBaseStyles()+extraStyles+'</style></head><body>'+
+  var bodyHtml=
     reportHeader('Cost Center Wise Consumption — ITEM WISE',printedOn,'Records: '+filtRows.length+' | Items: '+sortedItems.length)+
     (filterInfo.length?'<div class="filter-bar"><span>Filters:</span> '+filterInfo.join(' &nbsp;|&nbsp; ')+'</div>':'')+
     summaryChips([
@@ -1384,10 +1677,8 @@ function printItemWise(){
       ['₨ '+(totalValue/1000).toFixed(1)+'K','Total Value']
     ])+
     summaryTable+
-    detailTable+
-    '<div class="footer"><span>FANZ Spinning Mills — Item Wise Consumption Report</span><span>'+printedOn+'</span></div>'+
-    '<script>window.onload=function(){window.print();}<\/script></body></html>';
-  openPrintWindow(html);
+    detailTable;
+  showPrintReport(bodyHtml, extraStyles, 'FANZ — Item Wise Report', 'FANZ_ItemWise_Report.html');
 }
 
 // TABLE
@@ -1425,19 +1716,11 @@ function renderTable(ca){
   }).join('');
 
   ca.innerHTML=
-    '<div class="toolbar">'+tabsHtml()+
-      '<div class="tbr">'+
-        '<span class="rcnt">'+filtRows.length+' records</span>'+
-        '<select class="ssel" onchange="sortByV(this.value)">'+
-          '<option value="">Sort by…</option>'+
-          '<option value="date">Date</option>'+
-          '<option value="dept">Department</option>'+
-          '<option value="machine">Machine</option>'+
-          '<option value="value">Value ↓</option>'+
-          '<option value="itemDesc">Item Name</option>'+
-        '</select>'+
-        '<button class="exbtn" onclick="exportCSV()">⬇ Export CSV</button>'+
+    '<div class="toolbar">'+
+      '<div class="toolbar-row1"><div class="tb-tabs">'+tabsHtml()+'</div>'+
+        '<div class="tbr"><span class="rcnt">'+filtRows.length+' records</span></div>'+
       '</div>'+
+      toolbarRow2(true)+
     '</div>'+
     '<div class="twrap"><table><thead><tr>'+th+'</tr></thead><tbody>'+tb+'</tbody></table></div>'+
     '<div class="pager">'+
@@ -1453,7 +1736,12 @@ function sortByV(v){if(v)sortBy(v);}
 
 // SUMMARY
 function renderSummary(ca){
-  ca.innerHTML='<div class="toolbar">'+tabsHtml()+'<div class="tbr"><span class="rcnt">'+filtRows.length+' records</span><button class="exbtn" onclick="exportCSV()">⬇ Export CSV</button></div></div><div class="sgrid" id="sg"></div>';
+  ca.innerHTML='<div class="toolbar">'+
+      '<div class="toolbar-row1"><div class="tb-tabs">'+tabsHtml()+'</div>'+
+        '<div class="tbr"><span class="rcnt">'+filtRows.length+' records</span></div>'+
+      '</div>'+
+      toolbarRow2(false)+
+    '</div><div class="sgrid" id="sg"></div>';
   document.getElementById('sg').innerHTML=
     scard('📅 By Date',groupSum('date'),'top 10')+
     scard('🏭 By Department',groupSum('dept'),'top 10')+
@@ -1483,7 +1771,12 @@ function scard(title,entries,sub){
 
 // CHARTS
 function renderCharts(ca){
-  ca.innerHTML='<div class="toolbar">'+tabsHtml()+'</div><div class="carea" id="ca"></div>';
+  ca.innerHTML='<div class="toolbar">'+
+      '<div class="toolbar-row1"><div class="tb-tabs">'+tabsHtml()+'</div>'+
+        '<div class="tbr"><span class="rcnt">'+filtRows.length+' records</span></div>'+
+      '</div>'+
+      toolbarRow2(false)+
+    '</div><div class="carea" id="ca"></div>';
   document.getElementById('ca').innerHTML=
     bchart('Value by Date',groupSum('date'),'ca')+
     bchart('Value by Department',groupSum('dept'),'cb')+
@@ -1495,20 +1788,31 @@ function bchart(title,entries,cls){
   var bars=entries.map(function(e){
     var pct=max?(e[1]/max*100).toFixed(1):0;
     var lbl=e[1]>=1000?(e[1]/1000).toFixed(1)+'K':e[1].toFixed(0);
-    return '<div class="brow"><div class="blbl" title="'+esc(e[0])+'">'+esc(e[0])+'</div><div class="btrk"><div class="bfil '+cls+'" style="width:'+pct+'%"><span>'+lbl+'</span></div></div></div>';
+    return '<div class="brow"><div class="blbl" title="'+esc(e[0])+'">'+esc(e[0])+'</div><div class="btrk"><div class="bfil '+cls+'" style="width:'+pct+'%"></div></div><div class="bval">'+lbl+'</div></div>';
   }).join('');
   return '<div class="ccard"><h3>'+title+'</h3><div class="bchart">'+bars+'</div></div>';
 }
 
 // EXPORT
 function exportCSV(){
+  if(!filtRows.length){ alert('No data to export. Please load files first.'); return; }
   var h='Date,Description,Unit,Qty,Rate,Value,Department,Machine\n';
   var b=filtRows.map(function(r){
     return ['date','itemDesc','unit','qty','rate','value','dept','machine'].map(function(k){return '"'+String(r[k]).replace(/"/g,'""')+'"';}).join(',');
   }).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([h+b],{type:'text/csv'}));
-  a.download='consumption_export.csv';a.click();
+  try{
+    var a=document.createElement('a');
+    var url=URL.createObjectURL(new Blob([h+b],{type:'text/csv'}));
+    a.href=url;
+    a.download='consumption_export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+  }catch(e){
+    alert('Download was blocked by this browser/preview (error: '+e.message+'). '+
+      'Please open this dashboard file directly in your phone/desktop browser (not inside an app preview) and try again.');
+  }
 }
 </script>
 </body>
