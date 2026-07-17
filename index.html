@@ -1340,7 +1340,7 @@ function printDateWise(){
     var gid='dateGrp'+gIdx; gIdx++;
     tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
       '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>📅 '+date+
-      ' &nbsp;|&nbsp; '+rows.length+' items &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; '+rows.length+' items'+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
       tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
@@ -1497,7 +1497,7 @@ function printDeptWise(){
     var gid='deptGrp'+gIdx; gIdx++;
     tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
       '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>🏭 '+esc(dept)+
-      ' &nbsp;|&nbsp; '+rows.length+' records &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; '+rows.length+' records'+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
       tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
@@ -1623,7 +1623,7 @@ function printItemWise(){
     var gid='itemGrp'+gIdx; gIdx++;
     tableRows+='<tr class="group-header" onclick="toggleRptGroup(\''+gid+'\')">'+
       '<td colspan="7"><span class="grp-toggle" id="'+gid+'-arrow">▶</span>📦 '+esc(item)+
-      ' &nbsp;|&nbsp; '+rows.length+' entries &nbsp;|&nbsp; Qty: '+dtQty.toLocaleString()+
+      ' &nbsp;|&nbsp; '+rows.length+' entries'+
       ' &nbsp;|&nbsp; Value: ₨ '+dtVal.toLocaleString('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
     rows.forEach(function(r){
       tableRows+='<tr class="rpt-detail-row" data-grp="'+gid+'" style="display:none">'+
